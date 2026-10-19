@@ -1,0 +1,63 @@
+@import url('https://fonts.cdnfonts.com/css/clash-display');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; background: #ffffff; }
+  body {
+    @apply text-ink font-sans antialiased;
+    background:
+      radial-gradient(ellipse at top left, rgba(31, 56, 211, 0.08), transparent 28rem),
+      radial-gradient(ellipse at top right, rgba(31, 56, 211, 0.05), transparent 24rem),
+      linear-gradient(180deg, #ffffff 0%, #f8f9ff 48%, #ffffff 100%);
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4 { @apply font-display tracking-[-0.04em] text-secondary; }
+  p, span, div, a, button, input, select, textarea { @apply font-sans; }
+  ::selection { background: rgba(31, 56, 211, 0.18); color: #282828; }
+  :focus-visible { outline: 2px solid #1f38d3; outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-4 py-2.5 text-[15px] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white border border-primary hover:-translate-y-0.5 hover:bg-primary-strong;
+  }
+  .btn-thread {
+    @apply btn bg-primary-soft text-primary border border-primary/10 hover:-translate-y-0.5 hover:bg-primary/5;
+  }
+  .btn-outline {
+    @apply btn border border-tertiary bg-white text-ink shadow-sm hover:border-primary/40 hover:bg-primary-soft;
+  }
+  .btn-ghost { @apply btn text-ink hover:bg-primary-soft; }
+  .btn-danger { @apply btn bg-error text-white hover:bg-red-700; }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .input {
+    @apply w-full rounded-sm border border-tertiary bg-white px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-primary focus:ring-4 focus:ring-primary/10;
+  }
+  .label { @apply mb-1 block text-sm font-medium text-ink-soft; }
+  .card {
+    @apply rounded-md border border-tertiary bg-white;
+    box-shadow: 0 8px 32px -24px rgba(40, 40, 40, 0.35);
+  }
+  .seam { @apply rounded-md border border-dashed border-tertiary bg-white/80; }
+  .seam-line { @apply border-t border-dashed border-tertiary; }
+  .th { @apply whitespace-nowrap px-3 py-2 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-ink-faint; }
+  .td { @apply px-3 py-3 text-sm; }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply border border-tertiary bg-white/90;
+    box-shadow: 0 22px 60px -42px rgba(31, 56, 211, 0.18);
+  }
+  .text-luxe {
+    color: #1f38d3;
+    letter-spacing: -0.04em;
+  }
+}

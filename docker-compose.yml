@@ -1,0 +1,61 @@
+# One-command setup:  cp .env.example .env  &&  docker compose up --build
+# Store:  http://localhost        Admin:  http://localhost/admin        API docs:  http://localhost/swagger-ui.html (via :8080)
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mailpit
+    environment:
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-capstore}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in your .env file}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in your .env file (32+ random characters)}
+      CORS_ORIGINS: ${PUBLIC_URL:-http://localhost},http://localhost:5173,http://127.0.0.1:5173
+      FRONTEND_URL: ${PUBLIC_URL:-http://localhost}
+      UPLOAD_DIR: /app/uploads
+      STORE_NAME: ${STORE_NAME:-CapStore}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@capstore.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@123}
+      RAZORPAY_DEV_MODE: ${RAZORPAY_DEV_MODE:-false}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
+      COURIER_WEBHOOK_SECRET: ${COURIER_WEBHOOK_SECRET:-}
+      BUSINESS_NAME: ${BUSINESS_NAME:-Cap Store}
+      BUSINESS_GSTIN: ${BUSINESS_GSTIN:-27AAAAA0000A1Z5}
+      BUSINESS_ADDRESS: ${BUSINESS_ADDRESS:-Your workshop address, City}
+      BUSINESS_STATE: ${BUSINESS_STATE:-Maharashtra}
+      BUSINESS_EMAIL: ${BUSINESS_EMAIL:-sales@capstore.com}
+      BUSINESS_PHONE: ${BUSINESS_PHONE:-+91 90000 00000}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@capstore.com}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_AUTH: ${SMTP_AUTH:-false}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-false}
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  uploads:

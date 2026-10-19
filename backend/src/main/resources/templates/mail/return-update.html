@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family:Arial,sans-serif;color:#1b2a49">
+  <h2 th:text="${status}">Return update</h2>
+  <p>Hi <span th:text="${customerName}">Customer</span>,</p>
+  <p>Your return request for order <strong th:text="${orderNo}">ORDER</strong> has been updated.</p>
+  <p th:if="${awb != null}">Tracking ID: <strong th:text="${awb}">AWB</strong>
+    <span th:if="${courier != null}"> · Courier: <span th:text="${courier}">Courier</span></span></p>
+  <p th:if="${trackingUrl != null and !#strings.isEmpty(trackingUrl)}">
+    <a th:href="${trackingUrl}">View return / replacement tracking</a>
+  </p>
+</body>
+</html>

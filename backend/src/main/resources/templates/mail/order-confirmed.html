@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family:Arial,sans-serif;color:#1b2a49">
+  <h2>Order confirmed</h2>
+  <p>Hi <span th:text="${customerName}">Customer</span>,</p>
+  <p>Thank you for your order. Your order ID is <strong th:text="${orderNo}">ORDER</strong>
+    (reference <span th:text="${orderId}">ID</span>).</p>
+  <p>We will notify you when your order ships.</p>
+</body>
+</html>

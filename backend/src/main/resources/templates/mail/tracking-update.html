@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family:Arial,sans-serif;color:#1b2a49">
+  <h2>Shipment update: <span th:text="${status}">Status</span></h2>
+  <p>Hi <span th:text="${customerName}">Customer</span>,</p>
+  <p>Order <strong th:text="${orderNo}">ORDER</strong> has been updated to
+    <strong th:text="${status}">Status</strong>.</p>
+  <p>Tracking ID (AWB): <strong th:text="${awb}">AWB</strong></p>
+  <p th:if="${trackingUrl != null and !#strings.isEmpty(trackingUrl)}">
+    <a th:href="${trackingUrl}">Track your shipment</a>
+  </p>
+  <p th:if="${expectedDelivery != null}">Expected delivery: <span th:text="${expectedDelivery}">Date</span></p>
+</body>
+</html>

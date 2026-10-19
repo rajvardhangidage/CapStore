@@ -1,0 +1,8 @@
+.env
+/backend/application-local.yml
+node_modules/
+dist/
+target/
+uploads/
+.idea/
+*.iml
