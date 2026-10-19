@@ -23,12 +23,12 @@ capstore/
 
 **Option A: Docker app with your locally installed MySQL.** Needs Docker Desktop and a running local MySQL server.
 ```bash
-cp .env.example .env        # set JWT_SECRET and your local MySQL credentials
+cp .env.example .env        # set JWT_SECRET, admin credentials and your local MySQL credentials
 docker compose up --build
 ```
 The Compose stack does not start a MySQL container. Its backend connects to your computer's MySQL at `host.docker.internal:3306`; ensure MySQL accepts connections from Docker Desktop. Flyway creates the application tables in the existing `capstore` database.
 - Store: http://localhost
-- Admin panel: http://localhost/admin  (login: `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env`, default `admin@capstore.local` / `Admin@12345`)
+- Admin panel: http://localhost/admin  (login with `ADMIN_EMAIL` / `ADMIN_PASSWORD` configured in `.env`)
 - API docs (Swagger): http://localhost:8080/swagger-ui.html
 - Development email inbox (Mailpit): http://localhost:8025
 
@@ -40,7 +40,7 @@ docker compose up -d mailpit            # optional: local email inbox at :8025
 cd backend && mvn spring-boot:run
 cd frontend && npm install && npm run dev  # site on :5173 (proxies /api to :8080)
 ```
-Create the `capstore` database in your locally installed MySQL first. The backend automatically loads your ignored `backend/application-local.yml` credentials file; update that file if your MySQL username, password, or port differ. Flyway creates the tables on first start; the backend also creates the admin user, three categories, two sample caps (with bulk tiers), a `WELCOME10` coupon and a home banner so you can click around immediately.
+Create the `capstore` database in your locally installed MySQL first. The backend automatically loads your ignored `backend/application-local.yml` credentials file; update that file if your MySQL username, password, or port differ. Set `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in your environment or in that local config before starting; the backend has no built-in JWT secret or admin login. Flyway creates the tables on first start; the backend also creates the admin user (using the credentials you configured), three categories, two sample caps (with bulk tiers), a `WELCOME10` coupon and a home banner so you can click around immediately. The admin account is only seeded if it does not already exist; changing configuration does not change an existing account's password.
 
 ## 2. What is included
 
@@ -72,7 +72,7 @@ Customer-facing product and order detail URLs use opaque UUID references instead
 ## 3. Going live checklist
 
 1. **Razorpay:** payment simulation is disabled by default. For local-only simulation, explicitly set `RAZORPAY_DEV_MODE=true`; never enable it in production. For real payments, leave it `false`, fill `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`, and test with Razorpay test keys first. In the Razorpay dashboard add a webhook to `https://YOUR-DOMAIN/api/v1/payments/webhook` for events `payment.captured` and `order.paid`, and put that webhook's secret in `RAZORPAY_WEBHOOK_SECRET`. Rebuild/restart the backend after changing `.env`.
-2. **Secrets:** set a long random `JWT_SECRET`, a strong `DB_PASSWORD`, and change the admin password immediately after first login.
+2. **Secrets:** set a long random `JWT_SECRET`, a strong `DB_PASSWORD`, and a unique strong `ADMIN_PASSWORD`. Keep all credentials out of Git. Admin credentials are only used to create the initial admin account; reset an existing account's password through the application.
 3. **GST:** fill the `BUSINESS_*` values (GSTIN, address, state), then set the GST rate and shipping amounts from **Admin → Shipping & tax**. Confirm the correct GST rate for caps with your accountant. Prices you enter are before GST.
 4. **Shipping:** configure the flat charge and free-shipping threshold from **Admin → Shipping & tax**. These settings apply to new orders; existing order amounts and invoice tax rates are retained.
 5. **Email:** local Docker runs include Mailpit at http://localhost:8025 (SMTP on localhost:1025). For real mail, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_AUTH`, and `SMTP_STARTTLS`.

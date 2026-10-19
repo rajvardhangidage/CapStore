@@ -24,8 +24,8 @@ services:
       FRONTEND_URL: ${PUBLIC_URL:-http://localhost}
       UPLOAD_DIR: /app/uploads
       STORE_NAME: ${STORE_NAME:-CapStore}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@capstore.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@123}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in your .env file}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in your .env file}
       RAZORPAY_DEV_MODE: ${RAZORPAY_DEV_MODE:-false}
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
