@@ -39,7 +39,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(a -> a
-                .requestMatchers("/api/v1/auth/**", "/api/v1/payments/webhook", "/webhooks/courier/**",
+                .requestMatchers("/api/v1/auth/**", "/api/v1/contact", "/api/v1/payments/webhook", "/webhooks/courier/**",
                                  "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/products/**", "/api/v1/categories/**",
                                  "/api/v1/banners", "/api/v1/config", "/uploads/**").permitAll()

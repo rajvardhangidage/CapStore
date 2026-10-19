@@ -13,6 +13,10 @@ public class ExtraDtos {
     public record ForgotPasswordRequest(@NotBlank @Email String email) {}
     public record ResetPasswordRequest(@NotBlank String token,
                                        @NotBlank @Size(min = 8, message = "Password must be at least 8 characters") String newPassword) {}
+    public record ContactInquiryRequest(@NotBlank @Size(max = 100) @Pattern(regexp = "^[^\\r\\n]+$") String name,
+                                        @NotBlank @Email @Size(max = 254) @Pattern(regexp = "^[^\\r\\n]+$") String email,
+                                        @NotBlank @Pattern(regexp = "^[+]?[0-9() .-]{7,24}$") String phone,
+                                        @NotBlank @Size(min = 10, max = 3000) String message) {}
     public record CreateAdminRequest(@NotBlank String name, @NotBlank @Email String email,
                                      @NotBlank @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits") String phone,
                                      @NotBlank @Size(min = 8) String password) {}

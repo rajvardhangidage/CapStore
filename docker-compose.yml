@@ -37,6 +37,7 @@ services:
       BUSINESS_STATE: ${BUSINESS_STATE:-Maharashtra}
       BUSINESS_EMAIL: ${BUSINESS_EMAIL:-sales@capstore.com}
       BUSINESS_PHONE: ${BUSINESS_PHONE:-+91 90000 00000}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-${BUSINESS_EMAIL:-sales@capstore.com}}
       MAIL_FROM: ${MAIL_FROM:-no-reply@capstore.com}
       SMTP_HOST: ${SMTP_HOST:-mailpit}
       SMTP_PORT: ${SMTP_PORT:-1025}
@@ -48,12 +49,19 @@ services:
       - uploads:/app/uploads
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/v1/config"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
 
   frontend:
     build: ./frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "80:80"
 

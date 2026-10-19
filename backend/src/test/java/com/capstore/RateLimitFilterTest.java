@@ -28,6 +28,21 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void contactFormRemainsRateLimitedWhenAuthRateLimitIsDisabled() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+        ReflectionTestUtils.setField(filter, "enabled", false);
+
+        for (int i = 0; i < 11; i++) {
+            MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/contact");
+            MockHttpServletResponse response = new MockHttpServletResponse();
+
+            filter.doFilter(request, response, new MockFilterChain());
+
+            assertEquals(i < 10 ? 200 : 429, response.getStatus());
+        }
+    }
+
+    @Test
     void enabledRateLimitRejectsTheEleventhLoginAttempt() throws Exception {
         RateLimitFilter filter = new RateLimitFilter();
         ReflectionTestUtils.setField(filter, "enabled", true);

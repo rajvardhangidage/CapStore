@@ -14,36 +14,49 @@ function Navbar() {
   const nav = useNavigate()
   const [open, setOpen] = useState(false)
   const [menu, setMenu] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [q, setQ] = useState('')
 
   const search = (e) => {
     e.preventDefault()
     nav(`/products${q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ''}`)
     setOpen(false)
+    setSearchOpen(false)
   }
-  const linkCls = ({ isActive }) => `text-sm font-bold ${isActive ? 'text-ink' : 'text-ink-soft hover:text-ink'}`
+  const linkCls = ({ isActive }) => `text-sm font-semibold transition-colors ${isActive ? 'text-primary' : 'text-ink hover:text-primary'}`
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/70 shadow-[0_8px_32px_-24px_rgba(27,42,73,.4)] backdrop-blur-2xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
+    <header className="sticky top-0 z-40 border-b border-tertiary bg-white shadow-[0_8px_32px_-24px_rgba(40,40,40,.22)]">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
+        <button className="text-ink lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
         <Link to="/" className="group flex items-center gap-2.5">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white bg-white/75 shadow-md shadow-ink/10 transition-transform group-hover:-rotate-3 group-hover:scale-105">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md border border-tertiary bg-white transition-transform group-hover:-rotate-3 group-hover:scale-105">
             <CapMark className="h-7 w-8" />
           </span>
           <span className="font-display text-xl font-extrabold tracking-tight text-luxe">{cfg?.storeName || 'CapStore'}</span>
         </Link>
-        <nav className="ml-4 hidden items-center gap-5 md:flex">
-          <NavLink to="/products" className={linkCls}>Shop</NavLink>
-          {isB2B ? <NavLink to="/quotes" className={linkCls}>Quotes</NavLink> : !user && <NavLink to="/register?type=business" className={linkCls}>For business</NavLink>}
-        </nav>
-        <form onSubmit={search} className="ml-auto hidden max-w-xs flex-1 md:block">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-            <input className="input pl-9" placeholder="Search caps" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search caps" />
+        <nav className="hidden min-w-0 flex-1 grid-cols-[1fr_auto_1fr] items-center lg:grid">
+          <div className="flex items-center justify-end gap-10 pr-5">
+            <NavLink to="/" end className={linkCls}>Home</NavLink>
+            <NavLink to="/about" className={linkCls}>About us</NavLink>
           </div>
-        </form>
-        <div className="ml-auto flex items-center gap-1 md:ml-0">
+          <NavLink to="/products" className={({ isActive }) => `px-5 py-2 text-sm font-bold transition-colors ${isActive ? 'text-primary' : 'text-ink hover:text-primary'}`}>Shop</NavLink>
+          <div className="flex items-center gap-10 pl-5">
+            <NavLink to="/contact" className={linkCls}>Contact us</NavLink>
+            {isB2B ? <NavLink to="/quotes" className={linkCls}>Quotes</NavLink> : !user && <NavLink to="/register?type=business" className={linkCls}>For business</NavLink>}
+          </div>
+        </nav>
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setSearchOpen((value) => !value)}
+            className="rounded p-2 text-ink hover:bg-twill hover:text-primary"
+            aria-label={searchOpen ? 'Close search' : 'Open search'}
+            aria-expanded={searchOpen}
+            aria-controls="site-search"
+          >
+            {searchOpen ? <X size={20} /> : <Search size={20} />}
+          </button>
           <Link to="/wishlist" className="rounded p-2 hover:bg-twill" aria-label="Wishlist"><Heart size={20} /></Link>
           <Link to="/cart" className="relative rounded p-2 hover:bg-twill" aria-label={`Cart, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'items'}`}>
             <ShoppingBag size={20} />
@@ -71,12 +84,37 @@ function Navbar() {
             <Link to="/login" className="btn-primary btn-sm ml-1">Log in</Link>
           )}
         </div>
+        {searchOpen && (
+          <form
+            id="site-search"
+            onSubmit={search}
+            className="absolute right-4 top-full z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-md border border-tertiary bg-white p-3 shadow-lg"
+          >
+            <label className="sr-only" htmlFor="site-search-input">Search caps</label>
+            <div className="flex gap-2">
+              <div className="relative min-w-0 flex-1">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
+                <input
+                  id="site-search-input"
+                  autoFocus
+                  className="input pl-9"
+                  placeholder="Search caps"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn-primary">Search</button>
+            </div>
+          </form>
+        )}
       </div>
       {open && (
-        <div className="border-t border-twill-dark bg-white p-4 md:hidden">
-          <form onSubmit={search} className="mb-3"><input className="input" placeholder="Search caps" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search caps" /></form>
+        <div className="border-t border-tertiary bg-white p-4 lg:hidden">
           <div className="flex flex-col gap-3" onClick={() => setOpen(false)}>
+            <Link to="/" className="font-bold text-ink hover:text-primary">Home</Link>
+            <Link to="/about" className="font-bold text-ink hover:text-primary">About us</Link>
             <Link to="/products" className="font-bold">Shop all caps</Link>
+            <Link to="/contact" className="font-bold text-ink hover:text-primary">Contact us</Link>
             {isB2B ? <Link to="/quotes" className="font-bold">Quote requests</Link> : !user && <Link to="/register?type=business" className="font-bold">For business</Link>}
             {user && <Link to="/orders" className="font-bold">My orders</Link>}
           </div>
@@ -89,25 +127,25 @@ function Navbar() {
 function Footer() {
   const cfg = useStoreConfig()
   return (
-    <footer className="relative mt-20 overflow-hidden bg-gradient-to-br from-[#17233e] via-ink to-[#283b60] text-white">
+    <footer className="relative mt-20 overflow-hidden bg-secondary text-white">
       <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full border border-white/10" />
       <div className="pointer-events-none absolute -right-10 -top-16 h-52 w-52 rounded-full border border-thread/20" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <div className="flex items-center gap-2"><CapMark className="h-8 w-9" color="#f0b429" /><span className="font-display text-xl font-extrabold">{cfg?.storeName || 'CapStore'}</span></div>
-          <p className="mt-3 text-sm text-white/70">Caps made in our own workshop. One piece for you, or a thousand for your team.</p>
+          <p className="mt-3 text-sm leading-6 text-white/90">Caps made in our own workshop. One piece for you, or a thousand for your team.</p>
         </div>
         <div className="text-sm">
-          <h4 className="mb-2 font-bold">Shop</h4>
-          <ul className="space-y-1 text-white/70"><li><Link to="/products">All caps</Link></li><li><Link to="/orders">Track an order</Link></li><li><Link to="/wishlist">Wishlist</Link></li></ul>
+          <h4 className="mb-2 font-bold text-white">Explore</h4>
+          <ul className="space-y-2 text-white/90"><li><Link to="/">Home</Link></li><li><Link to="/products">Shop all caps</Link></li><li><Link to="/about">About us</Link></li><li><Link to="/contact">Contact us</Link></li></ul>
         </div>
         <div className="text-sm">
-          <h4 className="mb-2 font-bold">For business</h4>
-          <ul className="space-y-1 text-white/70"><li><Link to="/register?type=business">Open a business account</Link></li><li>Bulk pricing and GST invoices</li><li>Custom logo quotes</li></ul>
+          <h4 className="mb-2 font-bold text-white">For business</h4>
+          <ul className="space-y-2 text-white/90"><li><Link to="/register?type=business">Open a business account</Link></li><li><Link to="/quotes">Request a custom quote</Link></li><li><Link to="/orders">Track an order</Link></li><li><Link to="/wishlist">Wishlist</Link></li></ul>
         </div>
       </div>
       <div className="seam-line mx-auto max-w-7xl border-white/20" />
-      <p className="px-4 py-4 text-center text-xs text-white/50">© {new Date().getFullYear()} {cfg?.storeName || 'CapStore'}. All rights reserved.</p>
+      <p className="px-4 py-4 text-center text-xs text-white/80">© {new Date().getFullYear()} {cfg?.storeName || 'CapStore'}. All rights reserved.</p>
     </footer>
   )
 }

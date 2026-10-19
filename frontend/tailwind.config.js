@@ -11,7 +11,7 @@ export default {
         surface: '#ffffff',
         'on-surface': '#282828',
         error: '#d32f2f',
-        ink: { DEFAULT: '#282828', soft: '#5d6472', faint: '#6b7280' },
+        ink: { DEFAULT: '#282828', soft: '#374151', faint: '#4b5563' },
         twill: { DEFAULT: '#eef2ff', dark: '#dfe7ff' },
         thread: { DEFAULT: '#1f38d3', dark: '#1230c9', light: '#eef2ff' },
         brim: { DEFAULT: '#d32f2f', light: '#fbe8e8' },

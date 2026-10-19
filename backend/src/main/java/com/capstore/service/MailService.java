@@ -54,6 +54,27 @@ public class MailService {
         }
     }
 
+    public boolean sendContactInquiry(String to, String replyTo, String body) {
+        JavaMailSender s = sender.getIfAvailable();
+        if (s == null) {
+            log.error("Cannot send contact inquiry because email is not configured");
+            return false;
+        }
+        try {
+            SimpleMailMessage m = new SimpleMailMessage();
+            m.setFrom(from);
+            m.setTo(to);
+            m.setReplyTo(replyTo);
+            m.setSubject("New website contact inquiry");
+            m.setText(body);
+            s.send(m);
+            return true;
+        } catch (Exception e) {
+            log.warn("Failed to send website contact inquiry: {}", e.getMessage());
+            return false;
+        }
+    }
+
     public boolean sendHtml(String to, String subject, String template, Map<String, Object> model) {
         try {
             JavaMailSender s = sender.getIfAvailable();

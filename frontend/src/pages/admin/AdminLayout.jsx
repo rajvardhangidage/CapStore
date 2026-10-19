@@ -25,7 +25,7 @@ export default function AdminLayout() {
   const links = (
     <nav className="flex flex-col gap-1 p-3" onClick={() => setOpen(false)}>
       {NAV.map(([to, label, Icon, end]) => (
-        <NavLink key={to} to={to} end={end} className={({ isActive }) => `relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition-all ${isActive ? 'bg-white/15 text-white shadow-inner ring-1 ring-white/10 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-full before:bg-thread before:content-[""]' : 'text-white/65 hover:bg-white/[.07] hover:text-white'}`}>
+        <NavLink key={to} to={to} end={end} className={({ isActive }) => `relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition-all ${isActive ? 'bg-white/15 text-white shadow-inner ring-1 ring-white/10 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-full before:bg-thread before:content-[""]' : 'text-white/85 hover:bg-white/[.07] hover:text-white'}`}>
           <Icon size={18} className={to === '/admin' ? 'text-thread' : ''} />{label}
         </NavLink>
       ))}
@@ -38,7 +38,7 @@ export default function AdminLayout() {
         <div className="pointer-events-none absolute -left-16 top-48 h-40 w-40 rounded-full border border-thread/10" />
         <Link to="/" className="relative flex items-center gap-3 border-b border-white/10 px-5 py-6">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-inner"><CapMark className="h-7 w-8" color="#f0d39b" /></span>
-          <span><span className="block font-display text-lg font-extrabold tracking-tight">CapStore</span><span className="text-[10px] font-bold uppercase tracking-[.2em] text-white/45">Control room</span></span>
+          <span><span className="block font-display text-lg font-extrabold tracking-tight">CapStore</span><span className="text-[10px] font-bold uppercase tracking-[.2em] text-white/80">Control room</span></span>
         </Link>
         {links}
       </aside>
@@ -58,7 +58,7 @@ export default function AdminLayout() {
             <aside className="absolute inset-y-0 left-0 w-72 bg-gradient-to-b from-[#17233e] to-[#263958] text-white shadow-2xl">
               <button className="absolute right-3 top-3" onClick={() => setOpen(false)} aria-label="Close menu"><X /></button>
               <Link to="/" className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-                <CapMark className="h-8 w-9" color="#f0d39b" /><span className="font-display text-lg font-extrabold">CapStore <span className="text-white/50">Admin</span></span>
+                <CapMark className="h-8 w-9" color="#f0d39b" /><span className="font-display text-lg font-extrabold">CapStore <span className="text-white/80">Admin</span></span>
               </Link>
               {links}
             </aside>

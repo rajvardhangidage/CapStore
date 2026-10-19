@@ -2,7 +2,7 @@
 
 Spring Boot 3 · Java 17 · MySQL 8 · Flyway · JWT.  See the root `README.md` for the full guide.
 
-The project loads the ignored `application-local.yml` file automatically when present. It points to `localhost:3306/capstore` and keeps your database password out of tracked source files. Set `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in the environment or in that ignored local config before starting; there are no built-in credentials. The root `.env` file is used by Docker Compose and is not automatically loaded by `mvn spring-boot:run`. Start the backend from this directory with:
+The project loads the ignored `application-local.yml` file automatically when present. It points to `localhost:3306/capstore` and keeps your database password out of tracked source files. Set `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `CONTACT_EMAIL` in the environment or in that ignored local config before starting; there are no built-in credentials. `CONTACT_EMAIL` receives messages submitted through the public contact form. The root `.env` file is used by Docker Compose and is not automatically loaded by `mvn spring-boot:run`. Start the backend from this directory with:
 
 ```bash
 mvn spring-boot:run

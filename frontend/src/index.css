@@ -14,7 +14,7 @@
       linear-gradient(180deg, #ffffff 0%, #f8f9ff 48%, #ffffff 100%);
     min-height: 100vh;
   }
-  h1, h2, h3, h4 { @apply font-display tracking-[-0.04em] text-secondary; }
+  h1, h2, h3, h4 { @apply font-display tracking-[-0.04em]; }
   p, span, div, a, button, input, select, textarea { @apply font-sans; }
   ::selection { background: rgba(31, 56, 211, 0.18); color: #282828; }
   :focus-visible { outline: 2px solid #1f38d3; outline-offset: 3px; }

@@ -3,6 +3,8 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import { RequireAdmin, RequireAuth } from './components/Guards'
 import Home from './pages/Home'
+import About from './pages/About'
+import Contact from './pages/Contact'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
@@ -48,6 +50,8 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />

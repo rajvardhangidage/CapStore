@@ -23,7 +23,7 @@ capstore/
 
 **Option A: Docker app with your locally installed MySQL.** Needs Docker Desktop and a running local MySQL server.
 ```bash
-cp .env.example .env        # set JWT_SECRET, admin credentials and your local MySQL credentials
+cp .env.example .env        # set JWT_SECRET, admin credentials, contact inbox and local MySQL credentials
 docker compose up --build
 ```
 The Compose stack does not start a MySQL container. Its backend connects to your computer's MySQL at `host.docker.internal:3306`; ensure MySQL accepts connections from Docker Desktop. Flyway creates the application tables in the existing `capstore` database.
@@ -37,10 +37,14 @@ To try authenticated API endpoints in Swagger, use `POST /api/v1/auth/login` to 
 **Option B: for developers.**
 ```bash
 docker compose up -d mailpit            # optional: local email inbox at :8025
-cd backend && mvn spring-boot:run
-cd frontend && npm install && npm run dev  # site on :5173 (proxies /api to :8080)
+cd backend && mvn spring-boot:run       # start in this terminal and wait for "Started CapStoreApplication"
 ```
-Create the `capstore` database in your locally installed MySQL first. The backend automatically loads your ignored `backend/application-local.yml` credentials file; update that file if your MySQL username, password, or port differ. Set `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in your environment or in that local config before starting; the backend has no built-in JWT secret or admin login. Flyway creates the tables on first start; the backend also creates the admin user (using the credentials you configured), three categories, two sample caps (with bulk tiers), a `WELCOME10` coupon and a home banner so you can click around immediately. The admin account is only seeded if it does not already exist; changing configuration does not change an existing account's password.
+Create the `capstore` database in your locally installed MySQL first. The backend automatically loads your ignored `backend/application-local.yml` credentials file; update that file if your MySQL username, password, or port differ. Set `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `CONTACT_EMAIL` in your environment or in that local config before starting; the backend has no built-in JWT secret or admin login. `CONTACT_EMAIL` receives messages submitted through the Contact us page; Compose falls back to `BUSINESS_EMAIL` if it is not set. Flyway creates the tables on first start; the backend also creates the admin user (using the credentials you configured), three categories, two sample caps (with bulk tiers), a `WELCOME10` coupon and a home banner so you can click around immediately. The admin account is only seeded if it does not already exist; changing configuration does not change an existing account's password.
+
+In another terminal, wait until `curl -fsS http://localhost:8080/api/v1/config` returns the store configuration, then start Vite:
+```bash
+cd frontend && npm install && npm run dev
+```
 
 ## 2. What is included
 
