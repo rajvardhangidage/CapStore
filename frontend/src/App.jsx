@@ -18,7 +18,6 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Account from './pages/Account'
 import Wishlist from './pages/Wishlist'
-import Quotes from './pages/Quotes'
 import NotFound from './pages/NotFound'
 import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
@@ -29,7 +28,6 @@ import ProductForm from './pages/admin/ProductForm'
 import Inventory from './pages/admin/Inventory'
 import Customers from './pages/admin/Customers'
 import Coupons from './pages/admin/Coupons'
-import AdminQuotes from './pages/admin/Quotes'
 import Banners from './pages/admin/Banners'
 import Reports from './pages/admin/Reports'
 import StoreSettings from './pages/admin/StoreSettings'
@@ -65,7 +63,6 @@ export default function App() {
           <Route path="orders" element={auth(<Orders />)} />
           <Route path="orders/:id" element={auth(<OrderDetail />)} />
           <Route path="account" element={auth(<Account />)} />
-          <Route path="quotes" element={auth(<Quotes />)} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
@@ -78,7 +75,6 @@ export default function App() {
           <Route path="products/:id" element={<ProductForm />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="customers" element={<Customers />} />
-          <Route path="quotes" element={<AdminQuotes />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="banners" element={<Banners />} />
           <Route path="reports" element={<Reports />} />

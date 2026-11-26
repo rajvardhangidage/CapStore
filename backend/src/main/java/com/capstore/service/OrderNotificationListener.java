@@ -80,6 +80,7 @@ public class OrderNotificationListener {
     }
 
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendStatusMail(OrderStatusMailEvent event) {
         if (notificationLogs.claim(event.orderId(), event.type(), "") == 0) {
@@ -88,9 +89,9 @@ public class OrderNotificationListener {
         }
         for (int attempt = 1; attempt <= 3; attempt++) {
             if (mail.sendNow(event.recipient(), event.subject(), event.body())) return;
-            log.warn("Status email delivery attempt {} failed for {}", attempt, event.recipient());
+            log.warn("Status email delivery attempt {} failed for order {}", attempt, event.orderId());
         }
         notificationLogs.release(event.orderId(), event.type(), "");
-        log.error("Giving up status email delivery after retries for {}", event.recipient());
+        log.error("Giving up status email delivery after retries for order {}", event.orderId());
     }
 }

@@ -1,0 +1,60 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?sslMode=VERIFY_IDENTITY&serverTimezone=UTC&connectTimeout=5000&socketTimeout=30000&tcpKeepAlive=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:30000}
+      validation-timeout: ${DB_POOL_VALIDATION_TIMEOUT_MS:5000}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT_MS:600000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME_MS:1800000}
+      keepalive-time: ${DB_POOL_KEEPALIVE_TIME_MS:300000}
+      pool-name: CapStoreHikariPool
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+    validate-on-migrate: true
+    clean-disabled: true
+    baseline-on-migrate: false
+    out-of-order: false
+    user: ${FLYWAY_USER:}
+    password: ${FLYWAY_PASSWORD:}
+
+app:
+  storage:
+    type: s3
+    s3:
+      bucket: ${S3_BUCKET}
+      region: ${AWS_REGION}
+      endpoint: ${S3_ENDPOINT:}
+      public-base-url: ${S3_PUBLIC_BASE_URL}
+  api-docs:
+    enabled: false
+  cors:
+    allowed-origins: ${CORS_ORIGINS}
+  seed:
+    enabled: false
+  security:
+    rate-limit:
+      enabled: true
+  razorpay:
+    dev-mode: false
+logging:
+  level:
+    root: INFO
+    com.capstore: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %msg%n%ex"
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

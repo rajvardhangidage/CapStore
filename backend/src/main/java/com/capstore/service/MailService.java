@@ -37,7 +37,7 @@ public class MailService {
     public boolean sendNow(String to, String subject, String body) {
         JavaMailSender s = sender.getIfAvailable();
         if (s == null) {
-            log.info("[EMAIL not configured] To: {} | Subject: {}\n{}", to, subject, body);
+            log.warn("Email delivery skipped because SMTP is not configured");
             return true;
         }
         try {
@@ -49,7 +49,7 @@ public class MailService {
             s.send(m);
             return true;
         } catch (Exception e) {
-            log.warn("Failed to send email to {}: {}", to, e.getMessage());
+            log.warn("Email delivery failed ({})", e.getClass().getSimpleName());
             return false;
         }
     }
@@ -70,7 +70,7 @@ public class MailService {
             s.send(m);
             return true;
         } catch (Exception e) {
-            log.warn("Failed to send website contact inquiry: {}", e.getMessage());
+            log.warn("Contact inquiry delivery failed ({})", e.getClass().getSimpleName());
             return false;
         }
     }
@@ -82,7 +82,7 @@ public class MailService {
             context.setVariables(model);
             String body = templates.process(template, context);
             if (s == null) {
-                log.info("[HTML EMAIL not configured] To: {} | Subject: {}\n{}", to, subject, body);
+                log.warn("HTML email delivery skipped because SMTP is not configured");
                 return true;
             }
             MimeMessage message = s.createMimeMessage();
@@ -94,7 +94,7 @@ public class MailService {
             s.send(message);
             return true;
         } catch (Exception e) {
-            log.warn("Failed to render or send HTML email to {}: {}", to, e.getMessage(), e);
+            log.warn("HTML email rendering or delivery failed ({})", e.getClass().getSimpleName());
             return false;
         }
     }

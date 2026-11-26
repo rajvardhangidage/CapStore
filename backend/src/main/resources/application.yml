@@ -1,23 +1,37 @@
 server:
   port: 8080
+  shutdown: graceful
 
 spring:
   application:
     name: capstore-backend
-  config:
-    import: optional:file:./application-local.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:capstore}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: ${DB_USER:root}
-    password: ${DB_PASSWORD:root}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:capstore}?sslMode=DISABLED&allowPublicKeyRetrieval=true&serverTimezone=UTC&connectTimeout=5000&socketTimeout=30000
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      connection-timeout: 30000
+      validation-timeout: 5000
+      max-lifetime: 1800000
+      keepalive-time: 300000
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: none        # schema is owned by Flyway (db/migration)
     properties:
       hibernate.jdbc.time_zone: UTC
+      # Load lazy associations (category, images, order items...) in batches instead of one query per row.
+      hibernate.default_batch_fetch_size: 50
   flyway:
     enabled: true
+    validate-on-migrate: true
+    clean-disabled: true
+    baseline-on-migrate: false
+    out-of-order: false
   servlet:
     multipart:
       max-file-size: 5MB
@@ -31,8 +45,13 @@ spring:
     properties:
       mail.smtp.auth: ${SMTP_AUTH:false}
       mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+  mvc:
+    problemdetails:
+      enabled: false
 
 app:
+  seed:
+    enabled: ${APP_SEED_ENABLED:false}
   security:
     rate-limit:
       enabled: false
@@ -42,6 +61,8 @@ app:
     refresh-minutes: 5
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
+  api-docs:
+    enabled: true
   tax:
     gst-rate-percent: 5          # confirm the correct GST rate for caps with your CA
   shipping:
@@ -68,6 +89,14 @@ app:
   courier-webhook-secret: ${COURIER_WEBHOOK_SECRET:}
   upload:
     dir: ${UPLOAD_DIR:./uploads}
+  storage:
+    type: ${STORAGE_TYPE:local}
+    max-file-size-bytes: ${UPLOAD_MAX_FILE_SIZE_BYTES:5242880}
+    s3:
+      bucket: ${S3_BUCKET:}
+      region: ${AWS_REGION:}
+      endpoint: ${S3_ENDPOINT:}
+      public-base-url: ${S3_PUBLIC_BASE_URL:}
   store:
     name: ${STORE_NAME:CapStore}
   business:                       # printed on GST invoices
@@ -77,3 +106,32 @@ app:
     state: ${BUSINESS_STATE:Maharashtra}
     email: ${BUSINESS_EMAIL:sales@yourcompany.com}
     phone: ${BUSINESS_PHONE:+91 90000 00000}
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+    address: ${MANAGEMENT_ADDRESS:127.0.0.1}
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+springdoc:
+  api-docs:
+    enabled: ${app.api-docs.enabled}
+  swagger-ui:
+    enabled: ${app.api-docs.enabled}

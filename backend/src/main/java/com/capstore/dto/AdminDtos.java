@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class AdminDtos {
     public record CustomerResponse(Long id, String name, String email, String phone, String role,
-                                   String companyName, String gstNumber, boolean businessApproved,
                                    boolean enabled, LocalDateTime createdAt) {}
 
     public record LowStockItem(Long variantId, String productName, String sku, String size,

@@ -27,12 +27,12 @@ export function OrderBody({ o, timeline }) {
             </li>
           ))}
         </ul>
-        <dl className="mt-3 space-y-1 border-t-2 border-dashed border-twill-dark pt-3 text-sm">
+        <dl className="mt-3 space-y-1 border-t border-tertiary pt-3 text-sm">
           <div className="flex justify-between"><dt>Subtotal</dt><dd>{inr(o.subtotal)}</dd></div>
           {Number(o.discount) > 0 && <div className="flex justify-between text-moss"><dt>Discount {o.couponCode && `(${o.couponCode})`}</dt><dd>−{inr(o.discount)}</dd></div>}
           <div className="flex justify-between"><dt>GST</dt><dd>{inr(o.tax)}</dd></div>
           <div className="flex justify-between"><dt>Shipping</dt><dd>{Number(o.shipping) === 0 ? 'Free' : inr(o.shipping)}</dd></div>
-          <div className="flex justify-between text-base font-extrabold"><dt>Total</dt><dd>{inr(o.total)}</dd></div>
+          <div className="flex justify-between text-base font-semibold"><dt>Total</dt><dd>{inr(o.total)}</dd></div>
         </dl>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -53,10 +53,10 @@ export function OrderBody({ o, timeline }) {
             {tracking.expectedDelivery && <> · Expected delivery: <b>{fmtDate(tracking.expectedDelivery)}</b></>}
           </span>}
         </div>
-        <ol className="space-y-3 border-l-2 border-dashed border-ink/30 pl-4">
+        <ol className="space-y-3 border-l-2 border-tertiary pl-4">
           {events.map((t, i) => (
             <li key={i} className="relative text-sm">
-              <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full bg-ink" />
+              <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full bg-primary ring-4 ring-white" />
               <b>{statusLabel(t.status)}</b> <span className="text-ink-faint">· {fmtDate(t.occurredAt || t.at)}</span>
               {(t.description || t.note) && <p className="text-ink-soft">{t.description || t.note}</p>}
             </li>
@@ -110,7 +110,7 @@ export default function OrderDetail() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Link to="/orders" className="text-sm font-bold underline underline-offset-4">← All orders</Link>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <div><h1 className="text-2xl font-extrabold">{o.orderNo}</h1><p className="text-sm text-ink-soft">Placed {fmtDate(o.createdAt)}</p></div>
+        <div><h1 className="text-2xl font-semibold">{o.orderNo}</h1><p className="text-sm text-ink-soft">Placed {fmtDate(o.createdAt)}</p></div>
         <StatusBadge status={o.status} />
       </div>
       <div className="card mt-4 p-4"><OrderProgress status={o.status} />{!['CONFIRMED','PROCESSING','PACKED','SHIPPED','OUT_FOR_DELIVERY','DELIVERED'].includes(o.status) && <p className="text-sm text-ink-soft">Payment: <StatusBadge status={o.paymentStatus} /></p>}</div>
@@ -132,14 +132,14 @@ export default function OrderDetail() {
           <h2 className="mb-2 font-bold">Returns and replacements</h2>
           <ul className="space-y-3">
             {returns.map((r) => (
-              <li key={r.id} className="rounded-xl border border-ink/10 p-3 text-sm">
+              <li key={r.id} className="rounded-md border border-ink/10 p-3 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <b>{r.productName} · {r.quantity} item{r.quantity === 1 ? '' : 's'}</b>
                   <StatusBadge status={r.status} />
                 </div>
                 <p className="mt-1 text-ink-soft">{r.type === 'REPLACEMENT' ? 'Replacement' : 'Refund'} request · {r.reason}</p>
                 {r.refundAmount != null && r.type === 'REFUND' && <p className="mt-1">Calculated refund: <b>{inr(r.refundAmount)}</b></p>}
-                {r.awb && <p className="mt-1">Pickup tracking: <b>{r.courier} · {r.awb}</b>{r.trackingUrl && <> · <a className="font-bold underline" href={r.trackingUrl} target="_blank" rel="noreferrer">Track pickup</a></>}</p>}
+                {r.awb && <p className="mt-1">Pickup tracking: <b>{r.courier} · {r.awb}</b>{r.trackingUrl && <> · <a className="link" href={r.trackingUrl} target="_blank" rel="noreferrer">Track pickup</a></>}</p>}
                 {r.adminNote && <p className="mt-1 text-ink-soft">{r.adminNote}</p>}
                 {r.qcNote && <p className="mt-1 text-ink-soft">Quality check: {r.qcNote}</p>}
               </li>

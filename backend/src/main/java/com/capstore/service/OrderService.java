@@ -79,7 +79,7 @@ public class OrderService {
         BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem ci : lines) {
             ProductVariant v = ci.getVariant();
-            BigDecimal unit = pricing.unitPrice(v, user, ci.getQuantity());
+            BigDecimal unit = pricing.unitPrice(v);
             BigDecimal lineTotal = unit.multiply(BigDecimal.valueOf(ci.getQuantity()));
             OrderItem oi = new OrderItem();
             oi.setOrder(o);

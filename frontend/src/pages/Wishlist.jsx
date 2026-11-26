@@ -16,7 +16,7 @@ export default function Wishlist() {
   const list = data.filter((p) => ids.has(p.id))
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-extrabold">Wishlist</h1>
+      <h1 className="page-title mb-8">Wishlist</h1>
       {list.length === 0 ? <EmptyState title="Nothing saved yet" text="Tap the heart on any cap to save it here."><Link to="/products" className="btn-primary">Browse caps</Link></EmptyState>
         : <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">{list.map((p) => <ProductCard key={p.id} p={p} />)}</div>}
     </div>

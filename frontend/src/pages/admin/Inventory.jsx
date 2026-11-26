@@ -41,7 +41,7 @@ export default function Inventory() {
           <tr key={r.id}>
             <td className="td font-bold">{r.product}</td><td className="td">{r.sku}</td>
             <td className="td">{[r.color, r.size].filter(Boolean).join(' / ') || '—'}</td>
-            <td className={`td font-extrabold ${r.stockQty === 0 ? 'text-brim' : r.stockQty <= LOW ? 'text-amber-700' : ''}`}>{r.stockQty}</td>
+            <td className={`td font-semibold ${r.stockQty === 0 ? 'text-brim' : r.stockQty <= LOW ? 'text-warn' : ''}`}>{r.stockQty}</td>
             <td className="td"><div className="flex gap-2"><button className="btn-outline btn-sm" onClick={() => setAdjust({ v: r, delta: '', reason: 'Restock' })}>Adjust</button><button className="btn-ghost btn-sm" onClick={() => openLog(r)}>History</button></div></td>
           </tr>
         ))}

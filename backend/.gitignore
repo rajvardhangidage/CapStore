@@ -3,3 +3,12 @@ uploads/
 .idea/
 *.iml
 .env
+.env.*
+!.env.example
+application-local.yml
+application-local.yaml
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks

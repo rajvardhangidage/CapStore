@@ -20,9 +20,6 @@ public class User {
     private String passwordHash;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String companyName;
-    private String gstNumber;
-    private boolean businessApproved;
     private boolean enabled = true;
     @CreationTimestamp
     private LocalDateTime createdAt;

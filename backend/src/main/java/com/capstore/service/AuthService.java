@@ -29,16 +29,7 @@ public class AuthService {
         u.setEmail(email);
         u.setPhone(r.phone());
         u.setPasswordHash(encoder.encode(r.password()));
-        if (r.businessAccount()) {
-            if (isBlank(r.companyName()) || isBlank(r.gstNumber()))
-                throw ApiException.badRequest("Company name and GST number are required for business accounts");
-            u.setRole(Role.B2B_USER);
-            u.setCompanyName(r.companyName().trim());
-            u.setGstNumber(r.gstNumber().trim().toUpperCase());
-            u.setBusinessApproved(false); // admin must approve before bulk pricing applies
-        } else {
-            u.setRole(Role.USER);
-        }
+        u.setRole(Role.USER);
         users.save(u);
         return tokens(u);
     }
@@ -75,13 +66,11 @@ public class AuthService {
     }
 
     public static UserInfo info(User u) {
-        return new UserInfo(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name(),
-                u.getCompanyName(), u.isBusinessApproved());
+        return new UserInfo(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name());
     }
 
     private AuthResponse tokens(User u) {
         return new AuthResponse(jwt.accessToken(u), jwt.refreshToken(u), info(u));
     }
 
-    private boolean isBlank(String s) { return s == null || s.isBlank(); }
 }

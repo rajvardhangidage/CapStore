@@ -42,7 +42,7 @@ export async function startPayment(order, user, storeName = 'CapStore', confirmD
       name: storeName,
       description: `Order ${p.orderNo}`,
       prefill: { name: user?.name, email: user?.email, contact: user?.phone },
-      theme: { color: '#1b2a49' },
+      theme: { color: '#1f38d3' },
       handler: async (resp) => {
         try {
           const { data } = await api.post('/payments/verify', { orderId: order.id, ...resp })

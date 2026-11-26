@@ -8,7 +8,7 @@ import { PageHeader } from './common'
 
 const TYPES = [
   ['sales', 'Daily sales'], ['products', 'Product-wise sales'], ['categories', 'Category-wise sales'],
-  ['customer-types', 'B2B vs B2C'], ['gst', 'GST report'], ['inventory', 'Inventory & stock value'],
+  ['gst', 'GST report'], ['inventory', 'Inventory & stock value'],
 ]
 const iso = (d) => d.toISOString().slice(0, 10)
 const today = new Date()
@@ -41,7 +41,7 @@ export default function Reports() {
           <table className="w-full min-w-[560px]">
             <thead className="bg-twill/60"><tr>{data.headers.map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
             <tbody className="divide-y divide-twill-dark">
-              {data.rows.map((r, i) => <tr key={i} className={r[0] === 'TOTAL' ? 'bg-thread-light font-extrabold' : ''}>{r.map((c, j) => <td key={j} className="td">{fmtCell(c)}</td>)}</tr>)}
+              {data.rows.map((r, i) => <tr key={i} className={r[0] === 'TOTAL' ? 'bg-thread-light font-semibold' : ''}>{r.map((c, j) => <td key={j} className="td">{fmtCell(c)}</td>)}</tr>)}
             </tbody>
           </table>
           {data.rows.length === 0 && <p className="p-8 text-center text-sm text-ink-faint">No data for this period.</p>}

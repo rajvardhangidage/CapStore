@@ -44,8 +44,4 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @BatchSize(size = 50)
     private List<ProductVariant> variants = new ArrayList<>();
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @BatchSize(size = 50)
-    private List<BulkPriceTier> tiers = new ArrayList<>();
 }

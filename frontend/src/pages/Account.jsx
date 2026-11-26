@@ -44,16 +44,15 @@ export default function Account() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-extrabold">My account</h1>
+      <h1 className="page-title mb-8">My account</h1>
       <div className="card p-5 text-sm">
         <div className="flex items-start justify-between gap-3">
           <div><p><b>{user.name}</b></p><p>{user.email} · {user.phone}</p>
-            {user.role === 'B2B_USER' && <p className="mt-2">{user.companyName} · {user.businessApproved ? <span className="font-bold text-moss">Business account approved</span> : <span className="font-bold text-amber-700">Awaiting approval. Bulk pricing starts once approved.</span>}</p>}
           </div>
           <button className="btn-outline btn-sm shrink-0" onClick={() => setProfile({ name: user.name, email: user.email, phone: user.phone })}><Pencil size={13} /> Edit details</button>
         </div>
       </div>
-      <div className="mb-3 mt-8 flex items-center justify-between"><h2 className="text-xl font-extrabold">Saved addresses</h2><button className="btn-primary btn-sm" onClick={() => setEdit({ ...emptyAddress, name: user.name, phone: user.phone })}><Plus size={14} /> Add address</button></div>
+      <div className="mb-3 mt-8 flex items-center justify-between"><h2 className="text-xl font-semibold">Saved addresses</h2><button className="btn-primary btn-sm" onClick={() => setEdit({ ...emptyAddress, name: user.name, phone: user.phone })}><Plus size={14} /> Add address</button></div>
       {loading ? <PageLoader /> : error ? <ErrorBox message={error} onRetry={reload} /> : data.length === 0 ? <p className="text-sm text-ink-soft">No saved addresses yet.</p> : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {data.map((a) => (

@@ -87,15 +87,6 @@ public class AdminService {
     }
 
     @Transactional
-    public CustomerResponse approveBusiness(Long id) {
-        User u = users.findById(id).orElseThrow(() -> ApiException.notFound("User not found"));
-        if (u.getRole() != Role.B2B_USER) throw ApiException.badRequest("Not a business account");
-        u.setBusinessApproved(true);
-        notifier.businessApproved(u);
-        return toResponse(u);
-    }
-
-    @Transactional
     public CustomerResponse setEnabled(Long id, boolean enabled) {
         User u = users.findById(id).orElseThrow(() -> ApiException.notFound("User not found"));
         if (u.getRole() == Role.ADMIN) throw ApiException.badRequest("Cannot change an admin account");
@@ -144,6 +135,6 @@ public class AdminService {
 
     private CustomerResponse toResponse(User u) {
         return new CustomerResponse(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name(),
-                u.getCompanyName(), u.getGstNumber(), u.isBusinessApproved(), u.isEnabled(), u.getCreatedAt());
+                u.isEnabled(), u.getCreatedAt());
     }
 }

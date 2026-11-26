@@ -41,7 +41,6 @@ public class ReportService {
             case "sales" -> total("Daily sales" + range, List.of("Date", "Orders", "Revenue (Rs.)"), orders.salesByDay(f, t), true);
             case "products" -> total("Product-wise sales" + range, List.of("Product", "Units sold", "Revenue (Rs.)"), items.productSales(f, t), false);
             case "categories" -> total("Category-wise sales" + range, List.of("Category", "Units sold", "Revenue (Rs.)"), items.categorySales(f, t), false);
-            case "customer-types" -> total("B2B vs B2C sales" + range, List.of("Customer type", "Orders", "Revenue (Rs.)"), orders.salesByCustomerType(f, t), false);
             case "gst" -> gst(f, t, range);
             case "inventory" -> inventory();
             default -> throw ApiException.badRequest("Unknown report type");
@@ -71,14 +70,14 @@ public class ReportService {
         for (CustomerOrder o : orders.findPaidBetween(f, t)) {
             BigDecimal tv = o.getSubtotal().subtract(o.getDiscount() == null ? BigDecimal.ZERO : o.getDiscount());
             rows.add(new ArrayList<>(List.of("INV-" + o.getOrderNo(), o.getCreatedAt().format(fmt), o.getUser().getName(),
-                    o.getUser().getGstNumber() == null ? "-" : o.getUser().getGstNumber(), o.getShipState(), tv, o.getTax(), o.getTotal())));
+                    o.getShipState(), tv, o.getTax(), o.getTotal())));
             taxable = taxable.add(tv);
             tax = tax.add(o.getTax());
             total = total.add(o.getTotal());
         }
-        if (!rows.isEmpty()) rows.add(new ArrayList<>(List.of("TOTAL", "", "", "", "", taxable, tax, total)));
+        if (!rows.isEmpty()) rows.add(new ArrayList<>(List.of("TOTAL", "", "", "", taxable, tax, total)));
         return new ReportData("GST report" + range,
-                List.of("Invoice", "Date", "Customer", "Buyer GSTIN", "Place of supply", "Taxable value (Rs.)", "GST (Rs.)", "Invoice total (Rs.)"), rows);
+                List.of("Invoice", "Date", "Customer", "Place of supply", "Taxable value (Rs.)", "GST (Rs.)", "Invoice total (Rs.)"), rows);
     }
 
     private ReportData inventory() {

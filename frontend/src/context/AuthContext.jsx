@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
   const logout = () => { tokens.clear(); setUser(null) }
 
   return (
-    <AuthCtx.Provider value={{ user, loading, login, register, updateProfile, logout, isAdmin: user?.role === 'ADMIN', isB2B: user?.role === 'B2B_USER' }}>
+    <AuthCtx.Provider value={{ user, loading, login, register, updateProfile, logout, isAdmin: user?.role === 'ADMIN' }}>
       {children}
     </AuthCtx.Provider>
   )

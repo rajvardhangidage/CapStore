@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BriefcaseBusiness, Clock3, Mail, PackageCheck, Phone, ShoppingBag } from 'lucide-react'
+import { ArrowRight, Clock3, Mail, PackageCheck, Phone, ShoppingBag } from 'lucide-react'
 import api, { errMsg } from '../api'
 
 const contactOptions = [
@@ -10,13 +10,6 @@ const contactOptions = [
     text: 'Sign in to review your orders, check delivery progress or find your order details.',
     action: 'View my orders',
     to: '/orders',
-  },
-  {
-    icon: BriefcaseBusiness,
-    title: 'Bulk or custom caps',
-    text: 'For teams, events and branded caps, create a business account to request custom pricing.',
-    action: 'Business enquiries',
-    to: '/register?type=business',
   },
   {
     icon: ShoppingBag,
@@ -93,7 +86,7 @@ export default function Contact() {
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-primary">Contact us</p>
         <h1 className="text-4xl font-bold leading-tight sm:text-6xl">How can we help?</h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-ink-soft sm:text-lg">
-          Choose the option that best matches your question. Order details and business quote requests are available directly through your CapStore account.
+          Choose the option that best matches your question. Order details are available directly through your CapStore account.
         </p>
       </section>
 
@@ -159,7 +152,7 @@ export default function Contact() {
         </aside>
       </section>
 
-      <section className="mx-auto mt-12 grid max-w-6xl gap-5 md:grid-cols-3" aria-label="Contact options">
+      <section className="mx-auto mt-12 grid max-w-6xl gap-5 md:grid-cols-2" aria-label="Contact options">
         {contactOptions.map(({ icon: Icon, title, text, action, to }) => (
           <article key={title} className="card flex flex-col p-6 sm:p-8">
             <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary-soft text-primary">

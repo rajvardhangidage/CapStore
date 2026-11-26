@@ -1,5 +1,6 @@
 package com.capstore.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CartDtos {
-    public record AddItemRequest(@NotNull Long variantId, @Min(1) int quantity) {}
+    public record AddItemRequest(@NotNull Long variantId, @Min(1) @Max(10_000) int quantity) {}
     public record UpdateItemRequest(int quantity) {}
 
     public record CartItemResponse(Long itemId, Long variantId, Long productId, String productPublicId, String productName,

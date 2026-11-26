@@ -29,6 +29,6 @@ public class AdminUserService {
         u.setRole(Role.ADMIN);
         users.save(u);
         return new CustomerResponse(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name(),
-                null, null, false, true, u.getCreatedAt());
+                true, u.getCreatedAt());
     }
 }

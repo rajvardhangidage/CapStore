@@ -1,7 +1,6 @@
 package com.capstore.dto;
 
 import com.capstore.entity.DiscountType;
-import com.capstore.entity.QuoteStatus;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -42,15 +41,6 @@ public class ExtraDtos {
                               LocalDateTime expiresAt) {}
     public record ValidateCouponRequest(@NotBlank String code) {}
     public record CouponValidation(String code, BigDecimal discount, String description) {}
-
-    // ----- quotes -----
-    public record QuoteCreateRequest(Long productId, @Min(1) int quantity, @NotBlank String description, String logoUrl) {}
-    public record QuoteRespondRequest(@NotNull @DecimalMin("0.01") BigDecimal quotedPrice, String adminNote) {}
-    public record QuoteDecisionRequest(boolean accept) {}
-    public record QuoteResponse(Long id, Long productId, String productName, int quantity, String description,
-                                String logoUrl, QuoteStatus status, BigDecimal quotedPrice, String adminNote,
-                                String customerName, String customerEmail, String companyName,
-                                LocalDateTime createdAt) {}
 
     // ----- reviews -----
     public record ReviewRequest(@Min(1) @Max(5) int rating, @Size(max = 1000) String body) {}

@@ -36,15 +36,15 @@ public class CartService {
 
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getVariant().getId().equals(v.getId())).findFirst().orElse(null);
-        int newQty = (item == null ? 0 : item.getQuantity()) + r.quantity();
-        if (newQty > v.getStockQty()) throw ApiException.badRequest("Only " + v.getStockQty() + " in stock");
+        long requested = (long) (item == null ? 0 : item.getQuantity()) + r.quantity();
+        if (r.quantity() <= 0 || requested > v.getStockQty()) throw ApiException.badRequest("Only " + v.getStockQty() + " in stock");
         if (item == null) {
             item = new CartItem();
             item.setCart(cart);
             item.setVariant(v);
             cart.getItems().add(item);
         }
-        item.setQuantity(newQty);
+        item.setQuantity((int) requested);
         carts.saveAndFlush(cart);
         return toResponse(cart, u);
     }
@@ -87,7 +87,7 @@ public class CartService {
         List<CartItemResponse> items = cart.getItems().stream().map(i -> {
             ProductVariant v = i.getVariant();
             Product p = v.getProduct();
-            BigDecimal unit = pricing.unitPrice(v, u, i.getQuantity());
+            BigDecimal unit = pricing.unitPrice(v);
             return new CartItemResponse(i.getId(), v.getId(), p.getId(), p.getPublicId(), p.getName(), v.getSku(), v.getSize(),
                     v.getColor(), p.getImageUrl(), i.getQuantity(), v.getStockQty(), unit,
                     unit.multiply(BigDecimal.valueOf(i.getQuantity())));

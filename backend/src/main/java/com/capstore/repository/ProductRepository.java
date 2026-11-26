@@ -19,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         select p from Product p
         where p.active = true
           and (:categoryId is null or p.category.id = :categoryId)
-          and (:q is null or lower(p.name) like lower(concat('%', :q, '%')))
+          and (:q is null or lower(p.name) like lower(concat('%', :q, '%')) escape '!')
           and (:minPrice is null or p.basePrice >= :minPrice)
           and (:maxPrice is null or p.basePrice <= :maxPrice)
         """)

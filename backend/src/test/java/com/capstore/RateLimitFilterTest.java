@@ -7,6 +7,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RateLimitFilterTest {
@@ -39,6 +43,7 @@ class RateLimitFilterTest {
             filter.doFilter(request, response, new MockFilterChain());
 
             assertEquals(i < 10 ? 200 : 429, response.getStatus());
+            if (i == 10) assertEquals("60", response.getHeader("Retry-After"));
         }
     }
 
@@ -55,5 +60,25 @@ class RateLimitFilterTest {
 
             assertEquals(i < 10 ? 200 : 429, response.getStatus());
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void expiredClientBucketsAreRemovedInsteadOfClearingActiveLimits() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+        ReflectionTestUtils.setField(filter, "enabled", true);
+        Map<String, Deque<Long>> hits = (Map<String, Deque<Long>>) ReflectionTestUtils.getField(filter, "hits");
+        Deque<Long> expired = new ArrayDeque<>();
+        expired.add(System.currentTimeMillis() - 120_000);
+        hits.put("expired-client|/api/v1/auth/login", expired);
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/auth/login");
+        request.setRemoteAddr("new-client");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, new MockFilterChain());
+
+        assertEquals(200, response.getStatus());
+        assertEquals(1, hits.size());
     }
 }

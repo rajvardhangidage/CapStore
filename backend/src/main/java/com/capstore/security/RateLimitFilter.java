@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,6 +27,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final String CONTACT_PATH = "/api/v1/contact";
     private static final int MAX = 10;
     private static final long WINDOW_MS = 60_000;
+    private static final int MAX_TRACKED_KEYS = 10_000;
     private final Map<String, Deque<Long>> hits = new ConcurrentHashMap<>();
 
     @Override
@@ -39,20 +41,43 @@ public class RateLimitFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String key = req.getRemoteAddr() + "|" + req.getRequestURI();
         long now = System.currentTimeMillis();
-        Deque<Long> q = hits.computeIfAbsent(key, k -> new ArrayDeque<>());
+        Deque<Long> q = hits.get(key);
+        if (q == null) {
+            synchronized (hits) {
+                q = hits.get(key);
+                if (q == null) {
+                    hits.entrySet().removeIf(entry -> isExpired(entry.getValue(), now));
+                    if (hits.size() >= MAX_TRACKED_KEYS) {
+                        reject(res);
+                        return;
+                    }
+                    q = new ArrayDeque<>();
+                    hits.put(key, q);
+                }
+            }
+        }
         boolean allowed;
         synchronized (q) {
             while (!q.isEmpty() && now - q.peekFirst() > WINDOW_MS) q.pollFirst();
             allowed = q.size() < MAX;
             if (allowed) q.addLast(now);
         }
-        if (hits.size() > 10_000) hits.clear();
         if (!allowed) {
-            res.setStatus(429);
-            res.setContentType("application/json");
-            res.getWriter().write("{\"status\":429,\"message\":\"Too many attempts. Please wait a minute and try again.\"}");
+            reject(res);
             return;
         }
         chain.doFilter(req, res);
+    }
+
+    private boolean isExpired(Deque<Long> hits, long now) {
+        synchronized (hits) {
+            return hits.isEmpty() || now - hits.peekLast() > WINDOW_MS;
+        }
+    }
+
+    private void reject(HttpServletResponse res) throws IOException {
+        res.setHeader("Retry-After", "60");
+        JsonSecurityErrorHandler.write(res, HttpStatus.TOO_MANY_REQUESTS,
+                "Too many attempts. Please wait a minute and try again.");
     }
 }

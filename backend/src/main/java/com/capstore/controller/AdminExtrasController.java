@@ -3,7 +3,6 @@ package com.capstore.controller;
 import com.capstore.dto.AdminDtos.CustomerResponse;
 import com.capstore.dto.ExtraDtos.*;
 import com.capstore.dto.PageResponse;
-import com.capstore.entity.QuoteStatus;
 import com.capstore.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,6 @@ import java.util.List;
 public class AdminExtrasController {
     private final CouponService coupons;
     private final BannerService banners;
-    private final QuoteService quotes;
     private final ReportService reports;
     private final AdminUserService adminUsers;
     private final StoreSettingsService storeSettings;
@@ -64,17 +62,6 @@ public class AdminExtrasController {
 
     @DeleteMapping("/banners/{id}")
     public ResponseEntity<Void> deleteBanner(@PathVariable Long id) { banners.delete(id); return ResponseEntity.noContent().build(); }
-
-    // ----- quotes -----
-    @GetMapping("/quotes")
-    public PageResponse<QuoteResponse> quotes(@RequestParam(required = false) QuoteStatus status,
-                                              @RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "20") int size) {
-        return quotes.adminList(status, page, size);
-    }
-
-    @PutMapping("/quotes/{id}/respond")
-    public QuoteResponse respond(@PathVariable Long id, @Valid @RequestBody QuoteRespondRequest r) { return quotes.respond(id, r); }
 
     // ----- reports -----
     @GetMapping("/reports/{type}")

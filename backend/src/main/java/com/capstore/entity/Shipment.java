@@ -16,7 +16,7 @@ public class Shipment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "order_id", nullable = false, unique = true)
+    @JoinColumn(name = "order_id", nullable = false)
     private CustomerOrder order;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

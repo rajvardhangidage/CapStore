@@ -20,7 +20,6 @@ export default function ProductForm() {
     return (await api.get(`/admin/products/${id}`)).data
   }, [id])
   const [f, setF] = useState({ name: '', description: '', categoryId: '', basePrice: '', imageUrls: [], active: true, returnable: true })
-  const [tiers, setTiers] = useState([])
   const [variants, setVariants] = useState([{ ...blankVariant }]) // new product only
   const [busy, setBusy] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -37,7 +36,6 @@ export default function ProductForm() {
       active: p.active,
       returnable: p.returnable,
     })
-    setTiers(p.tiers.map((t) => ({ minQty: t.minQty, price: t.price })))
   }, [existing.data])
 
   if (cats.loading || existing.loading) return <PageLoader />
@@ -71,7 +69,6 @@ export default function ProductForm() {
     const body = {
       name: f.name, description: f.description, categoryId: Number(f.categoryId), basePrice: Number(f.basePrice),
       imageUrl: f.imageUrls[0] || null, imageUrls: f.imageUrls, active: f.active, returnable: f.returnable,
-      tiers: tiers.filter((t) => t.minQty && t.price).map((t) => ({ minQty: Number(t.minQty), price: Number(t.price) })),
     }
     try {
       if (isNew) await api.post('/admin/products', { ...body, variants: variants.filter((v) => v.sku.trim()).map(clean) })
@@ -94,7 +91,7 @@ export default function ProductForm() {
           <Field label="Description"><textarea className="input" rows={3} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></Field>
           <div>
             <Field label="Product images">
-              <span className="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/20 bg-white/40 px-4 py-5 text-sm font-bold text-ink-soft transition hover:border-thread-dark hover:bg-white/70">
+              <span className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-ink/20 bg-white/40 px-4 py-5 text-sm font-bold text-ink-soft transition hover:border-thread-dark hover:bg-white/70">
                 <Upload size={17} />{uploading ? 'Uploading images…' : 'Choose multiple images'}
                 <input type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={uploading} className="sr-only" onChange={(e) => { upload(Array.from(e.target.files || [])); e.target.value = '' }} />
               </span>
@@ -103,7 +100,7 @@ export default function ProductForm() {
             {f.imageUrls.length > 0 && (
               <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {f.imageUrls.map((url, index) => (
-                  <div key={`${url}-${index}`} className="group relative aspect-square overflow-hidden rounded-xl border border-white bg-white/60 shadow-sm">
+                  <div key={`${url}-${index}`} className="group relative aspect-square overflow-hidden rounded-md border border-white bg-white/60 shadow-sm">
                     <img src={url} alt={`Product preview ${index + 1}`} className="h-full w-full object-cover" />
                     {index === 0 && <span className="absolute bottom-2 left-2 rounded-full bg-ink/85 px-2 py-1 text-[10px] font-bold text-white">Cover</span>}
                     <button type="button" aria-label={`Remove image ${index + 1}`} onClick={() => setF((current) => ({ ...current, imageUrls: current.imageUrls.filter((_, i) => i !== index) }))} className="absolute right-2 top-2 rounded-full bg-white/90 p-1.5 text-brim shadow hover:bg-white">
@@ -116,18 +113,6 @@ export default function ProductForm() {
           </div>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} /> Visible in store</label>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.returnable} onChange={(e) => setF({ ...f, returnable: e.target.checked })} /> Eligible for returns and replacements</label>
-        </div>
-
-        <div className="card space-y-3 p-4">
-          <div className="flex items-center justify-between"><h2 className="font-bold">Bulk price tiers (business accounts)</h2><button type="button" className="btn-outline btn-sm" onClick={() => setTiers([...tiers, { minQty: '', price: '' }])}><Plus size={13} /> Add tier</button></div>
-          {tiers.length === 0 && <p className="text-sm text-ink-faint">No tiers. Business customers pay the normal price.</p>}
-          {tiers.map((t, i) => (
-            <div key={i} className="flex items-end gap-2">
-              <Field label="Min quantity"><input className="input" type="number" min="1" value={t.minQty} onChange={(e) => setTiers(tiers.map((x, j) => (j === i ? { ...x, minQty: e.target.value } : x)))} /></Field>
-              <Field label="Price per piece (₹)"><input className="input" type="number" min="0" step="0.01" value={t.price} onChange={(e) => setTiers(tiers.map((x, j) => (j === i ? { ...x, price: e.target.value } : x)))} /></Field>
-              <button type="button" className="p-2.5 text-brim" onClick={() => setTiers(tiers.filter((_, j) => j !== i))} aria-label="Remove tier"><Trash2 size={18} /></button>
-            </div>
-          ))}
         </div>
 
         {isNew && (

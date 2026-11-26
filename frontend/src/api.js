@@ -52,7 +52,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401 && orig && !orig._retry && tokens.refresh && !isAuthCall) {
       orig._retry = true
       try {
-        await refreshSession()
+        const data = await refreshSession()
         orig.headers.Authorization = `Bearer ${data.accessToken}`
         return api(orig)
       } catch (e) {

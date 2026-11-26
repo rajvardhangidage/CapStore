@@ -25,9 +25,6 @@ public class AdminCustomerController {
         return admin.customers(role, page, size);
     }
 
-    @PutMapping("/customers/{id}/approve-business")
-    public CustomerResponse approve(@PathVariable Long id) { return admin.approveBusiness(id); }
-
     @PutMapping("/customers/{id}/enabled")
     public CustomerResponse enabled(@PathVariable Long id, @RequestParam boolean value) { return admin.setEnabled(id, value); }
 }

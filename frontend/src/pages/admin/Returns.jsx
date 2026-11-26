@@ -45,7 +45,7 @@ export default function AdminReturns() {
               </div>
               <p className="text-sm">Reason: {r.reason}</p>
               {r.type === 'REFUND' && <p className="text-sm">Calculated refund: <b>{inr(r.refundAmount)}</b></p>}
-              {r.awb && <p className="text-sm">Pickup: {r.courier} · <b>{r.awb}</b>{r.trackingUrl && <> · <a href={r.trackingUrl} target="_blank" rel="noreferrer" className="font-bold underline">Track</a></>}</p>}
+              {r.awb && <p className="text-sm">Pickup: {r.courier} · <b>{r.awb}</b>{r.trackingUrl && <> · <a href={r.trackingUrl} target="_blank" rel="noreferrer" className="link">Track</a></>}</p>}
               {r.upiId && <p className="text-sm">Customer UPI: <b>{r.upiId}</b></p>}
               {r.adminNote && <p className="text-sm text-ink-soft">Admin note: {r.adminNote}</p>}
               {r.qcNote && <p className="text-sm text-ink-soft">QC note: {r.qcNote}</p>}

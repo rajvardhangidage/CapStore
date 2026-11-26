@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { errMsg } from '../api'
-import { EmptyState, Field, PageLoader } from '../components/ui'
+import { Lock, Plus } from 'lucide-react'
+import { CapMark, colorFor, EmptyState, ErrorBox, Field, PageLoader, Spinner } from '../components/ui'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useDialog, useToast } from '../context/ToastContext'
@@ -46,6 +47,7 @@ export default function Checkout() {
     if (addresses.data && sel === null) setSel(addresses.data.length ? (addresses.data.find((a) => a.defaultAddress) || addresses.data[0]).id : 'new')
   }, [addresses.data, sel])
 
+  if (addresses.error) return <ErrorBox message={addresses.error} onRetry={addresses.reload} />
   if (addresses.loading || sel === null) return <PageLoader />
   if (cart.items.length === 0) return <EmptyState title="Your cart is empty"><Link to="/products" className="btn-primary">Browse caps</Link></EmptyState>
 
@@ -96,45 +98,67 @@ export default function Checkout() {
     }
   }
 
+  const tile = (on) => `flex cursor-pointer gap-3 rounded-md border p-4 transition-colors ${on ? 'border-primary bg-primary-soft/50 ring-1 ring-primary' : 'border-tertiary hover:border-ink/40'}`
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-extrabold">Checkout</h1>
-      <form onSubmit={placeOrder} className="grid gap-8 lg:grid-cols-[1fr_360px]">
+    <div className="page py-10">
+      <header className="mb-8 border-b border-tertiary pb-6">
+        <ol className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-ink-faint" aria-label="Checkout steps">
+          <li><Link to="/cart" className="hover:text-primary">Cart</Link></li><li aria-hidden="true">/</li>
+          <li className="text-primary" aria-current="step">Delivery</li><li aria-hidden="true">/</li>
+          <li>Payment</li>
+        </ol>
+        <h1 className="page-title">Checkout</h1>
+      </header>
+      <form onSubmit={placeOrder} className="grid gap-10 lg:grid-cols-[1fr_380px]">
         <div className="space-y-4">
-          <h2 className="text-lg font-bold">Delivery address</h2>
-          {addresses.data.map((a) => (
-            <label key={a.id} className={`card flex cursor-pointer gap-3 p-4 ${sel === a.id ? 'ring-2 ring-ink' : ''}`}>
-              <input type="radio" name="addr" checked={sel === a.id} onChange={() => setSel(a.id)} className="mt-1" />
-              <span className="text-sm"><b>{a.name}</b> {a.label && <em className="text-ink-faint">({a.label})</em>}<br />{a.line1}{a.line2 ? `, ${a.line2}` : ''}<br />{a.city}, {a.state} {a.pincode}<br />Phone: {a.phone}</span>
+          <h2 className="flex items-center gap-3 text-lg font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs text-white">1</span>Delivery address</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {addresses.data.map((a) => (
+              <label key={a.id} className={tile(sel === a.id)}>
+                <input type="radio" name="addr" checked={sel === a.id} onChange={() => setSel(a.id)} className="mt-1" />
+                <span className="text-sm leading-6">
+                  <span className="flex items-center gap-2"><b>{a.name}</b>{a.label && <span className="rounded-full bg-twill px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.04em] text-ink-soft">{a.label}</span>}</span>
+                  <span className="block text-ink-soft">{a.line1}{a.line2 ? `, ${a.line2}` : ''}<br />{a.city}, {a.state} {a.pincode}<br />{a.phone}</span>
+                </span>
+              </label>
+            ))}
+            <label className={`${tile(sel === 'new')} items-center`}>
+              <input type="radio" name="addr" checked={sel === 'new'} onChange={() => setSel('new')} />
+              <span className="flex items-center gap-2 text-sm font-medium"><Plus size={16} />Use a new address</span>
             </label>
-          ))}
-          <label className={`card flex cursor-pointer gap-3 p-4 ${sel === 'new' ? 'ring-2 ring-ink' : ''}`}>
-            <input type="radio" name="addr" checked={sel === 'new'} onChange={() => setSel('new')} className="mt-1" />
-            <span className="text-sm font-bold">Use a new address</span>
-          </label>
+          </div>
           {sel === 'new' && (
-            <div className="card space-y-3 p-4">
+            <div className="animate-fade-up space-y-4 rounded-md border border-tertiary p-5">
               <AddressFields value={form} onChange={setForm} />
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={save} onChange={(e) => setSave(e.target.checked)} /> Save this address for next time</label>
             </div>
           )}
         </div>
-        <aside className="card h-fit space-y-3 p-5">
-          <h2 className="text-lg font-bold">Summary ({cart.items.length} {cart.items.length === 1 ? 'item' : 'items'})</h2>
-          <ul className="max-h-48 space-y-1 overflow-y-auto text-sm">
-            {cart.items.map((i) => <li key={i.key} className="flex justify-between gap-2"><span className="truncate">{i.quantity} × {i.productName}</span><span>{inr(i.lineTotal)}</span></li>)}
+        <aside className="h-fit space-y-5 rounded-md bg-twill p-6 lg:sticky lg:top-24">
+          <h2 className="font-display text-xl font-semibold uppercase">Summary <span className="text-ink-faint">({cart.totalQuantity})</span></h2>
+          <ul className="max-h-60 space-y-3 overflow-y-auto text-sm">
+            {cart.items.map((i) => (
+              <li key={i.key} className="flex items-center gap-3">
+                <span className="relative flex h-14 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-white">
+                  {i.imageUrl ? <img src={i.imageUrl} alt="" className="h-full w-full object-cover" /> : <CapMark className="w-3/4" color={colorFor(i.productName)} />}
+                  <span className="badge absolute -right-1 -top-1 min-w-[18px] justify-center px-1 text-[10px]">{i.quantity}</span>
+                </span>
+                <span className="min-w-0 flex-1"><span className="line-clamp-1 font-medium">{i.productName}</span><span className="text-xs text-ink-faint">{[i.color, i.size].filter(Boolean).join(' / ')}</span></span>
+                <span className="shrink-0">{inr(i.lineTotal)}</span>
+              </li>
+            ))}
           </ul>
-          <div className="seam-line" />
-          <dl className="space-y-1.5 text-sm">
-            <div className="flex justify-between"><dt>Subtotal</dt><dd>{inr(cart.subtotal)}</dd></div>
+          <dl className="space-y-2.5 border-t border-tertiary pt-5 text-sm">
+            <div className="flex justify-between"><dt className="text-ink-soft">Subtotal</dt><dd>{inr(cart.subtotal)}</dd></div>
             {discount > 0 && <div className="flex justify-between text-moss"><dt>Coupon {coupon.code}</dt><dd>−{inr(discount)}</dd></div>}
-            <div className="flex justify-between"><dt>GST</dt><dd>{inr(est.tax)}</dd></div>
-            <div className="flex justify-between"><dt>Shipping</dt><dd>{est.shipping === 0 ? 'Free' : inr(est.shipping)}</dd></div>
-            <div className="flex justify-between pt-1 text-base font-extrabold"><dt>Total</dt><dd>{inr(est.total)}</dd></div>
+            <div className="flex justify-between"><dt className="text-ink-soft">GST</dt><dd>{inr(est.tax)}</dd></div>
+            <div className="flex justify-between"><dt className="text-ink-soft">Shipping</dt><dd>{est.shipping === 0 ? <span className="font-medium text-moss">Free</span> : inr(est.shipping)}</dd></div>
+            <div className="flex justify-between border-t border-tertiary pt-3 text-lg font-semibold"><dt>Total</dt><dd>{inr(est.total)}</dd></div>
           </dl>
           <p className="text-xs text-ink-faint">The final amount is confirmed when your order is placed.</p>
-          <button className="btn-thread w-full py-3" disabled={busy}>{busy ? 'Please wait…' : `Place order & pay ${inr(est.total)}`}</button>
-          <p className="text-center text-xs text-ink-faint">Payments are processed securely by Razorpay.</p>
+          <button className="btn-primary btn-lg w-full" disabled={busy}>{busy ? <><Spinner className="h-4 w-4" /> Processing…</> : <><Lock size={16} /> Pay {inr(est.total)}</>}</button>
+          <p className="text-center text-xs text-ink-faint">UPI, cards, netbanking & wallets via Razorpay.</p>
         </aside>
       </form>
     </div>

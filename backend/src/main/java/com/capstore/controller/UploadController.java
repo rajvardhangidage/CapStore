@@ -2,13 +2,15 @@ package com.capstore.controller;
 
 import com.capstore.service.StorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-/** Image upload for logged-in users (product images for admins, logos for B2B quote requests). */
+/** Image upload for admins (product and banner images). */
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/v1/uploads")
 @RequiredArgsConstructor
 public class UploadController {

@@ -1,101 +1,165 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, BadgePercent, FileText, Truck, ShieldCheck, Factory } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Factory, FileText, RotateCcw, ShieldCheck, Truck } from 'lucide-react'
 import api from '../api'
 import ProductCard from '../components/ProductCard'
-import { CapMark, ErrorBox, PageLoader } from '../components/ui'
-import { useAsync } from '../lib/hooks'
+import { CapMark, ErrorBox, ProductGridSkeleton } from '../components/ui'
+import { useAsync, useStoreConfig } from '../lib/hooks'
+import { inr } from '../lib/format'
+
+const MARQUEE = ['Made in our own workshop', 'New styles every season', 'Easy returns', 'GST invoices', 'Ships across India']
+
+function Hero({ hero }) {
+  const title = hero?.title || 'Caps made to fit your everyday.'
+  const subtitle = hero?.subtitle || 'Cotton caps, snapbacks and bucket hats, made in our own workshop and shipped across India.'
+  const cta = hero?.linkUrl || '/products'
+
+  if (hero?.imageUrl) {
+    return (
+      <section className="relative isolate overflow-hidden bg-secondary text-white">
+        <img src={hero.imageUrl} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />
+        <div className="absolute inset-0 -z-10 bg-black/45" />
+        <div className="page flex min-h-[520px] flex-col justify-end py-14 md:min-h-[640px] md:py-20">
+          <p className="eyebrow text-white/80">New season</p>
+          <h1 className="mt-3 max-w-4xl font-display text-5xl font-semibold uppercase leading-[0.95] sm:text-6xl lg:text-[5.5rem]">{title}</h1>
+          <p className="mt-5 max-w-xl text-lg text-white/85">{subtitle}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to={cta} className="btn-primary btn-lg">Shop now <ArrowRight size={18} /></Link>
+            <Link to="/about" className="btn btn-lg border border-white bg-transparent text-white hover:bg-white hover:text-ink">Our story</Link>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="border-b border-tertiary">
+      <div className="page grid items-center gap-10 py-12 md:grid-cols-[1.15fr_1fr] md:py-20">
+        <div className="animate-fade-up">
+          <p className="chip">Made in our own workshop</p>
+          <h1 className="mt-5 font-display text-5xl font-semibold uppercase leading-[0.95] tracking-[-0.02em] sm:text-6xl lg:text-[5rem]">{title}</h1>
+          <p className="mt-6 max-w-lg text-lg leading-8 text-ink-soft">{subtitle}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to={cta} className="btn-primary btn-lg">Shop caps <ArrowRight size={18} /></Link>
+            <Link to="/about" className="btn-outline btn-lg">Our story</Link>
+          </div>
+        </div>
+        <div className="relative aspect-square overflow-hidden rounded-md bg-primary">
+          <span className="pointer-events-none absolute -left-4 top-4 select-none font-display text-[9rem] font-semibold uppercase leading-none text-white/10 sm:text-[11rem]" aria-hidden="true">Caps</span>
+          <CapMark className="absolute left-1/2 top-1/2 w-3/5 -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_24px_24px_rgba(0,0,0,.25)]" color="#ffffff" />
+          <div className="absolute inset-x-5 bottom-5 flex items-center justify-between text-white">
+            <span className="text-xs font-medium uppercase tracking-[0.08em]">Est. workshop · India</span>
+            <Link to="/products" className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary transition-transform hover:rotate-45" aria-label="Shop all caps"><ArrowUpRight size={20} /></Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Marquee() {
+  const row = [...MARQUEE, ...MARQUEE]
+  return (
+    <div className="overflow-hidden border-b border-tertiary py-4" aria-hidden="true">
+      <div className="flex w-max animate-marquee whitespace-nowrap">
+        {[...row, ...row].map((t, i) => (
+          <span key={i} className="flex items-center gap-10 pr-10 font-display text-xl font-medium uppercase tracking-[-0.01em] text-ink sm:text-2xl">
+            {t}<span className="h-2 w-2 rounded-full bg-primary" />
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SectionHead({ eyebrow, title, to, cta = 'View all' }) {
+  return (
+    <div className="mb-8 flex items-end justify-between gap-4">
+      <div>
+        {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
+        <h2 className="font-display text-3xl font-semibold uppercase leading-none sm:text-[2.75rem]">{title}</h2>
+      </div>
+      {to && <Link to={to} className="group flex shrink-0 items-center gap-1.5 text-sm font-medium uppercase tracking-[0.06em] hover:text-primary">{cta}<ArrowRight size={16} className="transition-transform group-hover:translate-x-1" /></Link>}
+    </div>
+  )
+}
 
 export default function Home() {
-  const { data, loading, error, reload } = useAsync(async () => {
-    const [banners, cats, prods] = await Promise.all([
-      api.get('/banners'), api.get('/categories'), api.get('/products', { params: { size: 8, sort: 'newest' } }),
-    ])
-    return { banners: banners.data, cats: cats.data, prods: prods.data.content }
+  const cfg = useStoreConfig()
+  const content = useAsync(async () => {
+    const [banners, cats] = await Promise.all([api.get('/banners'), api.get('/categories')])
+    return { banners: banners.data, cats: cats.data }
   })
-  if (loading) return <PageLoader />
-  if (error) return <ErrorBox message={error} onRetry={reload} />
-  const hero = data.banners[0]
-  const more = data.banners.slice(1)
+  const prods = useAsync(() => api.get('/products', { params: { size: 8, sort: 'newest' } }).then((r) => r.data.content))
+
+  if (content.error) return <ErrorBox message={content.error} onRetry={content.reload} />
+  const hero = content.data?.banners[0]
+  const more = content.data?.banners.slice(1) || []
 
   return (
     <>
-      <section className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 md:grid-cols-2 md:py-14">
-        <div className="relative z-10 py-4">
-          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-thread/30 bg-white/60 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[.2em] text-ink shadow-sm backdrop-blur"><span className="h-1.5 w-1.5 rounded-full bg-thread-dark" />Made in our own workshop</p>
-          <h1 className="max-w-2xl text-5xl font-extrabold leading-[.98] sm:text-6xl lg:text-[4.5rem]">{hero?.title || 'Caps that fit your head and your brand.'}</h1>
-          <p className="mt-5 max-w-lg text-base leading-7 text-ink-soft sm:text-lg">{hero?.subtitle || 'Cotton caps, snapbacks and bucket hats. Order one for yourself or a few hundred for your team.'}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to={hero?.linkUrl || '/products'} className="btn-primary">Shop caps <ArrowRight size={16} /></Link>
-            <Link to="/register?type=business" className="btn-outline">Order in bulk</Link>
-          </div>
-        </div>
-        <div className="glass-panel relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-br from-white/85 via-[#eef1f6]/80 to-[#dfe5ed]/75">
-          <div className="pointer-events-none absolute -right-12 -top-20 h-64 w-64 rounded-full bg-thread/15 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-12 h-64 w-64 rounded-full bg-ink/10 blur-3xl" />
-          {hero?.imageUrl
-            ? <img src={hero.imageUrl} alt="" className="relative h-full w-full object-cover" />
-            : <>
-                <div className="relative flex h-4/5 w-4/5 items-center justify-center rounded-[1.7rem] border border-white/70 bg-white/25 shadow-[0_30px_70px_-30px_rgba(27,42,73,.35)] backdrop-blur-sm">
-                  <CapMark className="w-3/5 drop-shadow-[0_24px_20px_rgba(27,42,73,.2)]" />
-                  <div className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full border border-white/80 bg-white/65 px-3 py-2 shadow-lg backdrop-blur-xl">
-                    {['#1b2a49', '#2f7d5b', '#c0392b', '#d6b06b', '#6b7794'].map((c) => <span key={c} className="h-4 w-4 rounded-full border border-white shadow-sm" style={{ background: c }} />)}
-                    <span className="ml-1 text-[10px] font-bold uppercase tracking-wider text-ink-soft">Made to wear</span>
-                  </div>
-                </div>
-              </>}
-        </div>
-      </section>
+      {content.loading ? <div className="skeleton h-[520px] rounded-none" /> : <Hero hero={hero} />}
+      <Marquee />
 
-      {more.length > 0 && (
-        <section className="mx-auto flex max-w-7xl gap-4 overflow-x-auto px-4 pb-6">
-          {more.map((b) => (
-            <Link key={b.id} to={b.linkUrl || '/products'} className="relative flex min-h-[140px] min-w-[280px] flex-1 flex-col justify-end overflow-hidden rounded-lg bg-ink p-5 text-white">
-              {b.imageUrl && <img src={b.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />}
-              <h3 className="relative text-lg font-bold">{b.title}</h3>
-              {b.subtitle && <p className="relative text-sm text-white/80">{b.subtitle}</p>}
-            </Link>
-          ))}
+      {content.data?.cats.length > 0 && (
+        <section className="page pt-14">
+          <div className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+            <Link to="/products" className="chip-outline chip-active shrink-0">All caps</Link>
+            {content.data.cats.map((c) => <Link key={c.id} to={`/products?categoryId=${c.id}`} className="chip-outline shrink-0">{c.name}</Link>)}
+          </div>
         </section>
       )}
 
-      <section className="mx-auto max-w-7xl px-4 py-6">
-        <div className="flex flex-wrap gap-2">
-          {data.cats.map((c) => <Link key={c.id} to={`/products?categoryId=${c.id}`} className="rounded-full border-2 border-dashed border-ink/30 bg-white px-4 py-1.5 text-sm font-bold hover:border-ink">{c.name}</Link>)}
-        </div>
+      <section className="page py-14">
+        <SectionHead eyebrow="Just dropped" title="New arrivals" to="/products" />
+        {prods.loading ? <ProductGridSkeleton />
+          : prods.error ? <ErrorBox message={prods.error} onRetry={prods.reload} />
+          : <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">{prods.data.map((p) => <ProductCard key={p.id} p={p} />)}</div>}
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-5 flex items-end justify-between">
-          <h2 className="text-2xl font-extrabold sm:text-3xl">New arrivals</h2>
-          <Link to="/products" className="text-sm font-bold underline underline-offset-4">See all</Link>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
-          {data.prods.map((p) => <ProductCard key={p.id} p={p} />)}
-        </div>
-      </section>
-
-      <section className="mx-auto my-10 max-w-7xl px-4">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#17233e] via-ink to-[#31466a] p-6 text-white shadow-[0_30px_80px_-40px_rgba(27,42,73,.65)] sm:p-10">
-          <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-white/10" />
-          <div className="pointer-events-none absolute -right-2 -top-14 h-44 w-44 rounded-full border border-thread/20" />
-          <div className="grid gap-8 md:grid-cols-2 md:items-center">
-            <div>
-              <h2 className="text-3xl font-extrabold">Ordering for a team, school or brand?</h2>
-              <p className="mt-2 text-white/75">Open a business account and get volume pricing, tax invoices for your accounts team, and quotes for custom logo embroidery.</p>
-              <Link to="/register?type=business" className="btn-thread mt-5">Open a business account</Link>
-            </div>
-            <ul className="space-y-4 text-sm">
-              <li className="flex gap-3"><BadgePercent className="shrink-0 text-thread" /><span><b>Bulk price tiers.</b> The more you order, the lower the price per cap.</span></li>
-              <li className="flex gap-3"><FileText className="shrink-0 text-thread" /><span><b>GST invoices.</b> Download a tax invoice for every paid order.</span></li>
-              <li className="flex gap-3"><Factory className="shrink-0 text-thread" /><span><b>Custom branding.</b> Upload your logo and request a quote.</span></li>
-            </ul>
+      {more.length > 0 && (
+        <section className="page pb-14">
+          <div className={`grid gap-4 ${more.length > 1 ? 'md:grid-cols-2' : ''}`}>
+            {more.map((b) => (
+              <Link key={b.id} to={b.linkUrl || '/products'} className="group relative isolate flex min-h-[260px] flex-col justify-end overflow-hidden rounded-md bg-secondary p-7 text-white">
+                {b.imageUrl && <img src={b.imageUrl} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105" />}
+                <h3 className="font-display text-3xl font-semibold uppercase leading-none">{b.title}</h3>
+                {b.subtitle && <p className="mt-2 text-white/80">{b.subtitle}</p>}
+                <span className="mt-5 flex items-center gap-1.5 text-sm font-medium uppercase tracking-[0.06em]">Shop now <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" /></span>
+              </Link>
+            ))}
           </div>
+        </section>
+      )}
+
+      <section className="page">
+        <div className="grid overflow-hidden rounded-md bg-primary text-white md:grid-cols-2">
+          <div className="p-8 sm:p-12">
+            <p className="eyebrow text-white/70">Why shop with us</p>
+            <h2 className="mt-3 font-display text-4xl font-semibold uppercase leading-[0.95] sm:text-5xl">Our workshop.<br />Your style.</h2>
+            <p className="mt-5 max-w-md text-white/80">Every cap is cut, stitched and checked in our own workshop, then shipped straight to you. No middlemen, no compromises.</p>
+            <Link to="/products" className="btn mt-8 border border-white bg-white text-primary hover:bg-primary-soft">Shop the collection <ArrowRight size={16} /></Link>
+          </div>
+          <ul className="grid gap-px bg-white/15">
+            {[[Factory, 'Made in-house', 'Quality materials, checked by the people who make them.'], [RotateCcw, 'Easy returns', 'Return or replace eligible items right from your orders page.'], [FileText, 'GST invoices', 'Download a tax invoice for every paid order.']].map(([Icon, t, d]) => (
+              <li key={t} className="flex gap-4 bg-primary p-6 sm:px-10">
+                <Icon className="mt-0.5 shrink-0" size={22} />
+                <div><h3 className="font-semibold">{t}</h3><p className="mt-1 text-sm text-white/75">{d}</p></div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-3">
-        {[[ShieldCheck, 'Secure payments', 'UPI, cards and netbanking through Razorpay.'], [Truck, 'Track every order', 'See each step from packing to your doorstep.'], [Factory, 'Straight from the maker', 'No middlemen, so you get workshop prices.']].map(([Icon, t, d]) => (
-          <div key={t} className="flex gap-3 p-2"><Icon className="shrink-0" /><div><h3 className="font-bold">{t}</h3><p className="text-sm text-ink-soft">{d}</p></div></div>
+      <section className="page mt-14 grid gap-px overflow-hidden rounded-md border border-tertiary bg-tertiary sm:grid-cols-3">
+        {[
+          [ShieldCheck, 'Secure payments', 'UPI, cards and netbanking through Razorpay.'],
+          [Truck, cfg?.freeShippingAbove != null ? `Free shipping over ${inr(cfg.freeShippingAbove)}` : 'Track every order', 'See each step from packing to your doorstep.'],
+          [Factory, 'Straight from the maker', 'No middlemen, so you get workshop prices.'],
+        ].map(([Icon, t, d]) => (
+          <div key={t} className="flex gap-4 bg-white p-6">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon size={20} /></span>
+            <div><h3 className="font-semibold">{t}</h3><p className="mt-1 text-sm text-ink-soft">{d}</p></div>
+          </div>
         ))}
       </section>
     </>

@@ -67,8 +67,6 @@ public class InvoiceService {
                     + o.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMM yyyy")) + "\nPlace of supply: " + o.getShipState(), norm));
             String buyer = o.getShipName() + "\n" + o.getShipLine1() + (o.getShipLine2() == null || o.getShipLine2().isBlank() ? "" : ", " + o.getShipLine2())
                     + "\n" + o.getShipCity() + ", " + o.getShipState() + " - " + o.getShipPincode() + "\nPhone: " + o.getShipPhone();
-            if (o.getUser().getCompanyName() != null)
-                buyer = o.getUser().getCompanyName() + "\nGSTIN: " + o.getUser().getGstNumber() + "\n" + buyer;
             meta.addCell(plain("Bill to:\n" + buyer, norm));
             doc.add(meta);
             doc.add(new Paragraph(" "));

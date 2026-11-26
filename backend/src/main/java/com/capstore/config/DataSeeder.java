@@ -14,7 +14,9 @@ import com.capstore.service.CatalogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,8 @@ import java.util.List;
 /** Creates the first admin and some sample caps so you can click around immediately. */
 @Slf4j
 @Component
+@Profile("!prod")
+@ConditionalOnProperty(prefix = "app.seed", name = "enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
     private final UserRepository users;
@@ -58,13 +62,13 @@ public class DataSeeder implements CommandLineRunner {
                     List.of(new VariantRequest("CBC-BLK-M", "M", "Black", null, 50),
                             new VariantRequest("CBC-BLK-L", "L", "Black", null, 40),
                             new VariantRequest("CBC-NVY-M", "M", "Navy", null, 30)),
-                    List.of(new TierRequest(25, new BigDecimal("349")), new TierRequest(100, new BigDecimal("299"))), null, null));
+                    null, null));
 
             catalog.create(new ProductRequest("Urban Flat-Brim Snapback", "Structured flat brim with snap closure.",
                     snapback, new BigDecimal("549"), null, true,
                     List.of(new VariantRequest("SNP-WHT-F", "Free", "White", null, 25),
                             new VariantRequest("SNP-RED-F", "Free", "Red", null, 5)),
-                    List.of(new TierRequest(50, new BigDecimal("479"))), null, null));
+                    null, null));
 
             Coupon c = new Coupon();
             c.setCode("WELCOME10");

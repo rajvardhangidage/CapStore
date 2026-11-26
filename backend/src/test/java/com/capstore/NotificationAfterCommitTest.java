@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,5 +47,9 @@ class NotificationAfterCommitTest {
                 .getMethod("sendStatusMail", OrderStatusMailEvent.class)
                 .getAnnotation(TransactionalEventListener.class);
         assertEquals(TransactionPhase.AFTER_COMMIT, annotation.phase());
+        Transactional transaction = OrderNotificationListener.class
+                .getMethod("sendStatusMail", OrderStatusMailEvent.class)
+                .getAnnotation(Transactional.class);
+        assertEquals(Propagation.REQUIRES_NEW, transaction.propagation());
     }
 }

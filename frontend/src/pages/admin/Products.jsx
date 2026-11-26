@@ -10,7 +10,7 @@ import { PageHeader, Table } from './common'
 
 export const toRequest = (p, over = {}) => ({
   name: p.name, description: p.description, categoryId: p.categoryId, basePrice: p.basePrice, imageUrl: p.imageUrl,
-  active: p.active, tiers: p.tiers.map((t) => ({ minQty: t.minQty, price: t.price })), ...over,
+  active: p.active, ...over,
 })
 
 export default function AdminProducts() {

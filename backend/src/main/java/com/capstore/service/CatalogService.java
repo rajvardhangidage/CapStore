@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,9 +55,12 @@ public class CatalogService {
         Sort s = switch (sort == null ? "" : sort) {
             case "price_asc" -> Sort.by("basePrice").ascending();
             case "price_desc" -> Sort.by("basePrice").descending();
+            case "name" -> Sort.by("name").ascending();
             default -> Sort.by("createdAt").descending();
         };
-        String query = (q == null || q.isBlank()) ? null : q.trim();
+        // Tie-break on id so products with the same price/timestamp never shift between pages.
+        s = s.and(Sort.by("id").descending());
+        String query = (q == null || q.isBlank()) ? null : escapeLike(q.trim());
         var result = products.search(categoryId, query, min, max, PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 60), s));
         return PageResponse.of(result, this::toResponse);
     }
@@ -117,7 +119,7 @@ public class CatalogService {
     @Transactional
     public VariantResponse updateVariant(Long variantId, VariantRequest vr) {
         ProductVariant v = variants.findById(variantId).orElseThrow(() -> ApiException.notFound("Variant not found"));
-        if (!v.getSku().equals(vr.sku()) && variants.existsBySku(vr.sku()))
+        if (!v.getSku().equals(vr.sku().trim()) && variants.existsBySku(vr.sku().trim()))
             throw ApiException.conflict("SKU already exists");
         v.setSku(vr.sku().trim());
         v.setSize(vr.size());
@@ -156,16 +158,6 @@ public class CatalogService {
         }
         if (r.active() != null) p.setActive(r.active());
         if (r.returnable() != null) p.setReturnable(r.returnable());
-        if (r.tiers() != null) {
-            p.getTiers().clear();
-            for (TierRequest t : r.tiers()) {
-                BulkPriceTier bt = new BulkPriceTier();
-                bt.setProduct(p);
-                bt.setMinQty(t.minQty());
-                bt.setPrice(t.price());
-                p.getTiers().add(bt);
-            }
-        }
     }
 
     private void addVariant(Product p, VariantRequest vr) {
@@ -183,6 +175,11 @@ public class CatalogService {
     private Product findByPublicId(String publicId) {
         return products.findByPublicId(publicId)
                 .orElseThrow(() -> ApiException.notFound("Product not found"));
+    }
+
+    /** Escapes LIKE wildcards so a search for "50%" matches literally instead of matching everything. */
+    public static String escapeLike(String q) {
+        return q.replace("!", "!!").replace("%", "!%").replace("_", "!_");
     }
 
     private interface Exists { boolean test(String slug); }
@@ -212,8 +209,6 @@ public class CatalogService {
                 p.getCategory().getId(), p.getCategory().getName(), p.getBasePrice(), p.getImageUrl(), p.isActive(),
                 images,
                 p.getVariants().stream().map(this::toResponse).toList(),
-                p.getTiers().stream().sorted(Comparator.comparingInt(BulkPriceTier::getMinQty))
-                        .map(t -> new TierResponse(t.getMinQty(), t.getPrice())).toList(),
                 p.isReturnable());
     }
 }

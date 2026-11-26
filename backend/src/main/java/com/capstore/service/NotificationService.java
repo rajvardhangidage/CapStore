@@ -1,7 +1,6 @@
 package com.capstore.service;
 
 import com.capstore.entity.CustomerOrder;
-import com.capstore.entity.QuoteRequest;
 import com.capstore.entity.User;
 import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +35,5 @@ public class NotificationService {
         mail.send(to, "Reset your password",
                 "We received a request to reset your password.\n\nReset it here (valid for 30 minutes):\n" + link
                 + "\n\nIf you did not request this, you can ignore this email.\n\n" + storeName);
-    }
-
-    public void quoteResponded(QuoteRequest q) {
-        mail.send(q.getUser().getEmail(), "Your quote is ready",
-                "Hi " + q.getUser().getName() + ",\n\nWe have quoted Rs. " + q.getQuotedPrice() + " per piece for "
-                + q.getQuantity() + " pcs." + (q.getAdminNote() != null ? "\nNote: " + q.getAdminNote() : "")
-                + "\n\nAccept or decline here: " + frontendUrl + "/quotes\n\n" + storeName);
-    }
-
-    public void businessApproved(User u) {
-        mail.send(u.getEmail(), "Your business account is approved",
-                "Hi " + u.getName() + ",\n\nYour business account for " + u.getCompanyName()
-                + " is approved. Bulk pricing is now active when you log in.\n\n" + frontendUrl + "\n\n" + storeName);
     }
 }

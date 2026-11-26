@@ -56,12 +56,4 @@ public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
         group by cast(o.createdAt as date) order by cast(o.createdAt as date)
         """)
     List<Object[]> salesByDay(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
-
-    @Query("""
-        select o.user.role, count(o), sum(o.total) from CustomerOrder o
-        where o.paymentStatus = com.capstore.entity.PaymentStatus.PAID
-          and o.createdAt between :from and :to
-        group by o.user.role
-        """)
-    List<Object[]> salesByCustomerType(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

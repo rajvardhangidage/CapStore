@@ -1,2 +1,9 @@
+.git
+.gitignore
+.env
+.env.*
 target/
 uploads/
+*.log
+.idea/
+.vscode/

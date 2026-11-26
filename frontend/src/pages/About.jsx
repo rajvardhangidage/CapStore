@@ -14,8 +14,8 @@ const values = [
   },
   {
     icon: Sparkles,
-    title: 'Made for your team, too',
-    text: 'Need a larger run or custom branding? We help businesses and groups bring their ideas together with bulk pricing and custom quotes.',
+    title: 'Made to last',
+    text: 'Sturdy stitching, breathable fabrics and adjustable fits mean your cap keeps its shape wash after wash.',
   },
 ]
 
@@ -26,7 +26,7 @@ export default function About() {
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-primary">About us</p>
         <h1 className="text-4xl font-bold leading-tight sm:text-6xl">Good caps start with care.</h1>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-ink-soft sm:text-lg">
-          We are a cap maker focused on practical design, dependable quality and personal style. Every piece starts in our workshop, where we make headwear for everyday wear and for teams with something to say.
+          We are a cap maker focused on practical design, dependable quality and personal style. Every piece starts in our workshop, where we make headwear for everyday wear.
         </p>
         <Link to="/products" className="btn-primary mt-8">Explore the collection <ArrowRight size={16} /></Link>
       </section>
@@ -45,10 +45,10 @@ export default function About() {
 
       <section className="mt-12 flex flex-col items-start justify-between gap-5 rounded-md bg-primary-soft p-6 sm:flex-row sm:items-center sm:p-8">
         <div>
-          <h2 className="text-2xl font-bold">A cap for yourself or your whole crew?</h2>
-          <p className="mt-2 max-w-2xl leading-7 text-ink-soft">Shop the collection for individual pieces, or get in touch through a business account for bulk pricing and custom branding.</p>
+          <h2 className="text-2xl font-bold">Found your next favourite cap?</h2>
+          <p className="mt-2 max-w-2xl leading-7 text-ink-soft">Browse the full collection of caps, snapbacks and bucket hats, delivered across India.</p>
         </div>
-        <Link to="/register?type=business" className="btn-primary shrink-0">Business orders <ArrowRight size={16} /></Link>
+        <Link to="/products" className="btn-primary shrink-0">Shop now <ArrowRight size={16} /></Link>
       </section>
     </div>
   )

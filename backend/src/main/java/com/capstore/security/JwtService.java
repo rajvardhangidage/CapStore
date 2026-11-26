@@ -22,6 +22,10 @@ public class JwtService {
     public JwtService(@Value("${app.jwt.secret}") String secret,
                       @Value("${app.jwt.access-minutes}") long accessMinutes,
                       @Value("${app.jwt.refresh-minutes}") long refreshMinutes) {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32)
+            throw new IllegalArgumentException("JWT_SECRET must be at least 32 bytes");
+        if (accessMinutes <= 0 || refreshMinutes <= 0)
+            throw new IllegalArgumentException("JWT access and refresh lifetimes must be positive");
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessMs = accessMinutes * 60_000L;
         this.refreshMs = refreshMinutes * 60_000L;

@@ -77,7 +77,7 @@ export function ToastProvider({ children }) {
         {active && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 p-4" role="presentation">
             <section
-              className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl"
+              className="w-full max-w-md rounded-md bg-white p-5 shadow-xl"
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="popup-title"
