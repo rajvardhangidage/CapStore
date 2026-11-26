@@ -19,3 +19,9 @@ uploads/
 .idea/
 *.iml
 .DS_Store
+
+# Local-only docs and config
+docs/
+*design.md
+.github/workflows/
+CLAUDE.md
